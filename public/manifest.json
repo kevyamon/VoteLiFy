@@ -1,0 +1,25 @@
+{
+  "short_name": "VoteLiFy",
+  "name": "VoteLiFy (VLF) — Plateforme Électorale Sécurisée",
+  "description": "Plateforme numérique officielle de vote sécurisé et de proclamation certifiée.",
+  "icons": [
+    {
+      "src": "/logo.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/logo.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#ffffff",
+  "theme_color": "#f20411",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "lang": "fr-FR"
+}
