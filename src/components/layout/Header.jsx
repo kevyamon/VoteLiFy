@@ -49,21 +49,17 @@ export const Header = ({
           {/* Statut du scrutin en direct (Visible en permanence sur Desktop & Mobile) */}
           <div className="flex items-center">
             {isVotingOpen ? (
-              <div className="inline-flex items-center gap-1.5 sm:gap-2.5 px-2.5 sm:px-4 py-1 sm:py-2 rounded-full bg-emerald-50 text-emerald-800 shadow-sm border border-emerald-200/80">
-                <span className="relative flex h-2 sm:h-2.5 w-2 sm:w-2.5">
+              <div className="inline-flex items-center gap-2 px-3 sm:px-3.5 py-1.5 rounded-full bg-emerald-50 text-emerald-800 text-[11px] sm:text-xs font-semibold border border-emerald-200/80 shadow-xs">
+                <span className="relative flex h-2 w-2">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 sm:h-2.5 w-2 sm:w-2.5 bg-emerald-600"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-600"></span>
                 </span>
-                <span className="text-[11px] sm:text-xs font-bold tracking-wide uppercase">
-                  Scrutin ouvert
-                </span>
+                <span>Scrutin ouvert</span>
               </div>
             ) : (
-              <div className="inline-flex items-center gap-1.5 sm:gap-2.5 px-2.5 sm:px-4 py-1 sm:py-2 rounded-full bg-rose-50 text-rose-800 shadow-sm border border-rose-200/80">
-                <span className="h-2 sm:h-2.5 w-2 sm:w-2.5 rounded-full bg-rose-500 flex-shrink-0" />
-                <span className="text-[11px] sm:text-xs font-bold tracking-wide uppercase">
-                  Scrutin fermé
-                </span>
+              <div className="inline-flex items-center gap-2 px-3 sm:px-3.5 py-1.5 rounded-full bg-slate-100 text-slate-700 text-[11px] sm:text-xs font-semibold border border-slate-200/80 shadow-xs">
+                <span className="h-2 w-2 rounded-full bg-slate-400 flex-shrink-0" />
+                <span>Scrutin clos</span>
               </div>
             )}
           </div>
@@ -109,7 +105,7 @@ export const Header = ({
           <div className="pb-2 flex justify-between items-center border-b border-surface-border/50">
             <span className="text-xs font-semibold text-content-muted">Statut du scrutin</span>
             {isVotingOpen ? (
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 text-xs font-bold border border-emerald-200/80">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 text-xs font-semibold border border-emerald-200/80">
                 <span className="relative flex h-2 w-2">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-600"></span>
@@ -117,9 +113,9 @@ export const Header = ({
                 <span>Scrutin ouvert</span>
               </div>
             ) : (
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-50 text-rose-800 text-xs font-bold border border-rose-200/80">
-                <span className="h-2 w-2 rounded-full bg-rose-500" />
-                <span>Scrutin fermé</span>
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 text-slate-700 text-xs font-semibold border border-slate-200/80">
+                <span className="h-2 w-2 rounded-full bg-slate-400" />
+                <span>Scrutin clos</span>
               </div>
             )}
           </div>

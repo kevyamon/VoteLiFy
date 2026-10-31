@@ -4,6 +4,7 @@ import { Button } from '../components/common/Button.jsx';
 import { Badge } from '../components/common/Badge.jsx';
 import { useToast } from '../context/ToastContext.jsx';
 import { ApplySuccessState } from '../components/candidate/ApplySuccessState.jsx';
+import { ApplySkeleton } from '../components/common/Skeleton.jsx';
 import {
   ArrowLeft,
   Upload,
@@ -112,11 +113,7 @@ export const ApplyCandidate = ({ onNavigate }) => {
   const isCandidacyOpen = electionInfo?.candidacies?.isOpen;
 
   if (isLoading) {
-    return (
-      <div className="flex-1 flex items-center justify-center py-20">
-        <div className="w-10 h-10 border-4 border-brand-red border-t-transparent rounded-full animate-spin" />
-      </div>
-    );
+    return <ApplySkeleton />;
   }
 
   // Écran d'information si la période est fermée (CDC Section 3.1)

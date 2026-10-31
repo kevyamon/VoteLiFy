@@ -4,6 +4,7 @@ import { CandidateCard } from '../components/candidates/CandidateCard.jsx';
 import { VoteModal } from '../components/vote/VoteModal.jsx';
 import { CountdownTimer } from '../components/common/CountdownTimer.jsx';
 import { Button } from '../components/common/Button.jsx';
+import { HomeSkeleton } from '../components/common/Skeleton.jsx';
 import { UserPlus, RefreshCw, Users } from 'lucide-react';
 
 export const Home = ({ onNavigate }) => {
@@ -60,6 +61,10 @@ export const Home = ({ onNavigate }) => {
     ? 'Clôture des candidatures dans'
     : 'Proclamation des résultats dans';
 
+  if (isLoading) {
+    return <HomeSkeleton />;
+  }
+
   return (
     <main className="flex-1 pb-16">
       {/* 1. Bannière de présentation officielle du scrutin (CDC Section 5.2) */}
@@ -109,13 +114,8 @@ export const Home = ({ onNavigate }) => {
           </div>
         </div>
 
-        {/* Chargement initial */}
-        {isLoading ? (
-          <div className="py-20 text-center space-y-3">
-            <div className="w-10 h-10 border-4 border-brand-red border-t-transparent rounded-full animate-spin mx-auto" />
-            <p className="text-sm font-semibold text-content-muted">Chargement du scrutin...</p>
-          </div>
-        ) : groupedPositionsIsEmpty(groupedCandidates) ? (
+        {/* Liste des candidatures ou état vide */}
+        {groupedPositionsIsEmpty(groupedCandidates) ? (
           /* État vide si aucune candidature validée */
           <div className="py-20 text-center max-w-md mx-auto space-y-4">
             <div className="w-14 h-14 bg-slate-100 text-slate-400 rounded-full flex items-center justify-center mx-auto">

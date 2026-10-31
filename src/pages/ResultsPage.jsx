@@ -3,26 +3,32 @@ import { api } from '../services/api.js';
 import { Button } from '../components/common/Button.jsx';
 import { Badge } from '../components/common/Badge.jsx';
 import { CountdownTimer } from '../components/common/CountdownTimer.jsx';
+import { ResultsSkeleton } from '../components/common/Skeleton.jsx';
 import {
   Award,
   ArrowLeft,
   Clock,
-  Users,
-  CheckCircle2,
-  AlertCircle,
   Trophy,
   Scale,
+  Calendar,
+  Vote,
+  ShieldCheck,
 } from 'lucide-react';
 
 export const ResultsPage = ({ onNavigate }) => {
   const [resultsData, setResultsData] = useState(null);
+  const [electionInfo, setElectionInfo] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
   const fetchResults = async () => {
     setIsLoading(true);
     try {
-      const data = await api.getResults();
-      setResultsData(data);
+      const [resData, info] = await Promise.all([
+        api.getResults(),
+        api.getElectionInfo(),
+      ]);
+      setResultsData(resData);
+      setElectionInfo(info);
     } catch (err) {
       console.error('Erreur lors du chargement des résultats :', err);
     } finally {
@@ -35,63 +41,137 @@ export const ResultsPage = ({ onNavigate }) => {
   }, []);
 
   if (isLoading) {
-    return (
-      <main className="flex-1 flex items-center justify-center py-20">
-        <div className="w-10 h-10 border-4 border-brand-red border-t-transparent rounded-full animate-spin" />
-      </main>
-    );
+    return <ResultsSkeleton />;
   }
 
   const isPublished = resultsData?.isPublished;
+  const isVotingOpen = electionInfo?.voting?.isOpen;
+  const isCandidacyOpen = electionInfo?.candidacies?.isOpen;
+  const publishTarget = resultsData?.publishAt || electionInfo?.results?.publishAt;
 
   return (
     <main className="flex-1 pb-16">
       {/* 1. ÉTAT A : Résultats en attente de proclamation (CDC Section 10.1) */}
       {!isPublished ? (
-        <section className="max-w-2xl mx-auto px-4 py-16 text-center space-y-6 animate-fade-in">
-          <div className="w-16 h-16 bg-blue-50 text-brand-blue rounded-full flex items-center justify-center mx-auto shadow-inner">
-            <Clock className="w-8 h-8" />
+        <section className="max-w-3xl mx-auto px-4 sm:px-6 py-10 space-y-8 animate-fade-in">
+          {/* Carte descriptive officielle de l'élection */}
+          <div className="bg-surface-pure rounded-2xl border border-surface-border p-6 sm:p-8 shadow-soft space-y-5">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-surface-border gap-3">
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 bg-blue-50 text-brand-blue rounded-xl">
+                  <ShieldCheck className="w-6 h-6" />
+                </div>
+                <div>
+                  <span className="text-[11px] font-bold text-brand-blue uppercase tracking-wider block">
+                    Scrutin Communautaire
+                  </span>
+                  <h2 className="text-xl sm:text-2xl font-extrabold text-content-title">
+                    {electionInfo?.title || resultsData?.title || 'Élection des responsables — Communauté No-Code'}
+                  </h2>
+                </div>
+              </div>
+
+              {/* Statut dynamique de l'élection */}
+              <div>
+                {isVotingOpen ? (
+                  <Badge variant="success" dot={true} size="sm">
+                    Scrutin en cours
+                  </Badge>
+                ) : isCandidacyOpen ? (
+                  <Badge variant="info" dot={true} size="sm">
+                    Candidatures ouvertes
+                  </Badge>
+                ) : (
+                  <Badge variant="neutral" dot={false} size="sm">
+                    Scrutin clos
+                  </Badge>
+                )}
+              </div>
+            </div>
+
+            <p className="text-sm text-content-body leading-relaxed">
+              {electionInfo?.description ||
+                'Scrutin officiel et confidentiel de la communauté FORMATION NO-CODE pour le renouvellement des représentants.'}
+            </p>
+
+            {/* Calendrier et jalons temporels */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 text-xs">
+              <div className="p-3 bg-surface-subtle rounded-xl border border-surface-border flex items-center gap-3">
+                <Calendar className="w-4 h-4 text-brand-blue flex-shrink-0" />
+                <div>
+                  <span className="text-content-muted block">Phase de vote</span>
+                  <span className="font-semibold text-content-title">
+                    {electionInfo?.voting?.endAt
+                      ? `Jusqu'au ${new Date(electionInfo.voting.endAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}`
+                      : 'Période officielle annoncée'}
+                  </span>
+                </div>
+              </div>
+
+              <div className="p-3 bg-surface-subtle rounded-xl border border-surface-border flex items-center gap-3">
+                <Clock className="w-4 h-4 text-brand-red flex-shrink-0" />
+                <div>
+                  <span className="text-content-muted block">Proclamation certifiée</span>
+                  <span className="font-semibold text-content-title">
+                    {publishTarget
+                      ? new Date(publishTarget).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
+                      : 'À l’issue du dépouillement'}
+                  </span>
+                </div>
+              </div>
+            </div>
           </div>
 
-          <div className="space-y-3">
-            <div className="inline-flex items-center gap-3 px-5 py-2.5 rounded-full bg-blue-50/90 text-brand-blue border border-brand-blue/20 shadow-sm backdrop-blur-sm mx-auto">
-              <span className="relative flex h-3 w-3">
+          {/* Bloc d'attente de proclamation avec pulse */}
+          <div className="bg-surface-pure rounded-2xl border border-surface-border p-8 text-center space-y-6 shadow-soft">
+            <div className="inline-flex items-center gap-2.5 px-4 sm:px-5 py-2 rounded-full bg-blue-50/90 text-brand-blue border border-brand-blue/20 shadow-xs mx-auto">
+              <span className="relative flex h-2.5 w-2.5">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-blue opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-3 w-3 bg-brand-blue"></span>
+                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-brand-blue"></span>
               </span>
-              <span className="text-xs sm:text-sm font-bold tracking-wider uppercase">
+              <span className="text-xs font-bold tracking-wider uppercase">
                 Décompte en cours
               </span>
             </div>
 
-            <h1 className="text-3xl font-extrabold text-content-title tracking-tight">
-              Proclamation Officielle en Attente
-            </h1>
-
-            <p className="text-base text-content-body max-w-lg mx-auto leading-relaxed">
-              {resultsData?.message ||
-                'Scrutin en cours d’évaluation. Les résultats certifiés seront proclamés par la Commission Électorale à l’issue de la période officielle.'}
-            </p>
-          </div>
-
-          {/* Compte à rebours si date de proclamation fixée */}
-          {resultsData?.publishAt && (
-            <div className="pt-2">
-              <CountdownTimer
-                targetDate={resultsData.publishAt}
-                label="Proclamation officielle des résultats dans"
-              />
+            <div className="space-y-2 max-w-lg mx-auto">
+              <h1 className="text-2xl sm:text-3xl font-extrabold text-content-title tracking-tight">
+                Proclamation Officielle en Attente
+              </h1>
+              <p className="text-sm text-content-body leading-relaxed">
+                {resultsData?.message ||
+                  'Scrutin en cours d’évaluation. Les résultats certifiés seront proclamés par la Commission Électorale à l’issue de la période officielle.'}
+              </p>
             </div>
-          )}
 
-          <div className="pt-4">
-            <Button
-              variant="outline"
-              icon={<ArrowLeft className="w-4 h-4" />}
-              onClick={() => onNavigate('home')}
-            >
-              Retourner à l’accueil
-            </Button>
+            {/* Compte à rebours dynamique si date fixée */}
+            {publishTarget && (
+              <div className="pt-2">
+                <CountdownTimer
+                  targetDate={publishTarget}
+                  label="Proclamation officielle des résultats dans"
+                />
+              </div>
+            )}
+
+            <div className="pt-4 flex flex-wrap justify-center gap-3">
+              {isVotingOpen && (
+                <Button
+                  variant="primary"
+                  icon={<Vote className="w-4 h-4" />}
+                  onClick={() => onNavigate('home')}
+                >
+                  Participer au vote dès maintenant
+                </Button>
+              )}
+              <Button
+                variant="outline"
+                icon={<ArrowLeft className="w-4 h-4" />}
+                onClick={() => onNavigate('home')}
+              >
+                Retourner à l’accueil
+              </Button>
+            </div>
           </div>
         </section>
       ) : (
