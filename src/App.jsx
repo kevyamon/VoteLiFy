@@ -169,7 +169,6 @@ function MainApp() {
               Se connecter
             </button>
           </div>
-          <Footer onOpenAdminAuth={() => setAdminAuthModalOpen(true)} />
           <AdminLoginModal
             isOpen={adminAuthModalOpen}
             onClose={() => setAdminAuthModalOpen(false)}
@@ -223,8 +222,10 @@ function MainApp() {
       )}
 
 
-      {/* Pied de page officiel avec déclencheur 10 secondes */}
-      <Footer onOpenAdminAuth={() => setAdminAuthModalOpen(true)} />
+      {/* Pied de page officiel avec déclencheur 10 secondes (exclusivement sur la page Home) */}
+      {currentPage === 'home' && (
+        <Footer onOpenAdminAuth={() => setAdminAuthModalOpen(true)} />
+      )}
 
       {/* Modale d'authentification discrète Commission Électorale */}
       <AdminLoginModal

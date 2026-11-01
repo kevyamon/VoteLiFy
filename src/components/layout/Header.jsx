@@ -69,17 +69,6 @@ export const Header = ({
               Élections
             </Button>
 
-            {isCandidacyOpen && (
-              <Button
-                variant={currentPage === 'apply' ? 'primary' : 'outline'}
-                size="sm"
-                icon={<UserPlus className="w-4 h-4" />}
-                onClick={() => handleNav('apply')}
-              >
-                Postuler
-              </Button>
-            )}
-
             <Button
               variant={currentPage === 'results' ? 'secondary' : 'outline'}
               size="sm"
@@ -105,16 +94,17 @@ export const Header = ({
 
       {/* Menu Mobile Déroulant */}
       {mobileMenuOpen && (
-        <div className="md:hidden border-t border-surface-border bg-surface-pure px-4 py-4 space-y-3 animate-fade-in shadow-soft">
+        <div className="md:hidden border-t border-surface-border bg-surface-pure px-4 py-4 space-y-2.5 animate-fade-in shadow-soft">
+          {/* Ligne 1 : Bouton Résultats et Bouton Élections */}
           <div className="grid grid-cols-2 gap-2 pt-1">
             <Button
-              variant={currentPage === 'home' ? 'primary' : 'outline'}
+              variant={currentPage === 'results' ? 'secondary' : 'outline'}
               size="sm"
               fullWidth={true}
-              icon={<Home className="w-4 h-4" />}
-              onClick={() => handleNav('home')}
+              icon={<Award className="w-4 h-4" />}
+              onClick={() => handleNav('results')}
             >
-              Accueil
+              Résultats
             </Button>
 
             <Button
@@ -128,26 +118,16 @@ export const Header = ({
             </Button>
           </div>
 
-          <div className="grid grid-cols-2 gap-2">
+          {/* Ligne 2 : Bouton Accueil qui remplit tout l'espace d'en bas */}
+          <div>
             <Button
-              variant={currentPage === 'apply' ? 'primary' : 'outline'}
+              variant={currentPage === 'home' ? 'primary' : 'outline'}
               size="sm"
               fullWidth={true}
-              icon={<UserPlus className="w-4 h-4" />}
-              onClick={() => handleNav('apply')}
-              disabled={!isCandidacyOpen}
+              icon={<Home className="w-4 h-4" />}
+              onClick={() => handleNav('home')}
             >
-              Postuler
-            </Button>
-
-            <Button
-              variant={currentPage === 'results' ? 'secondary' : 'outline'}
-              size="sm"
-              fullWidth={true}
-              icon={<Award className="w-4 h-4" />}
-              onClick={() => handleNav('results')}
-            >
-              Résultats
+              Accueil
             </Button>
           </div>
         </div>

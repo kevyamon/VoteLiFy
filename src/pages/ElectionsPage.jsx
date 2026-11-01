@@ -55,49 +55,49 @@ export const ElectionsPage = ({ onNavigate, onSelectElection }) => {
 
   return (
     <main className="flex-1 pb-16 bg-surface-subtle">
-      {/* 1. En-tête de la page des élections */}
-      <section className="bg-gradient-to-b from-surface-pure to-surface-subtle border-b border-surface-border py-12 md:py-16">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-4">
-          <div className="flex justify-center">
-            <button
-              onClick={() => onNavigate('home')}
-              className="inline-flex items-center gap-1.5 text-xs font-semibold text-content-muted hover:text-brand-red transition-colors mb-2"
-            >
-              <ChevronLeft className="w-4 h-4" />
-              <span>Retour à l'accueil</span>
-            </button>
-          </div>
+      {/* 1. En-tête compact et épuré de la page des élections */}
+      <section className="bg-gradient-to-b from-surface-pure to-surface-subtle border-b border-surface-border py-4 sm:py-6">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="space-y-1">
+              <button
+                onClick={() => onNavigate('home')}
+                className="inline-flex items-center gap-1.5 text-xs font-semibold text-content-muted hover:text-brand-red transition-colors mb-1"
+              >
+                <ChevronLeft className="w-3.5 h-3.5" />
+                <span>Retour à l'accueil</span>
+              </button>
 
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-brand-red-light text-brand-red text-xs font-bold border border-brand-red/20">
-            <Vote className="w-4 h-4" />
-            <span>Catalogue Officiel des Scrutins</span>
-          </div>
+              <div className="flex items-center gap-3">
+                <h1 className="text-xl sm:text-2xl font-black text-content-title tracking-tight">
+                  Élections & Scrutins
+                </h1>
+                <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-brand-red-light text-brand-red border border-brand-red/20">
+                  {elections.length} disponible{elections.length > 1 ? 's' : ''}
+                </span>
+              </div>
+              <p className="text-xs text-content-muted">
+                Choisissez votre élection pour découvrir les candidats et déposer votre suffrage.
+              </p>
+            </div>
 
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-content-title tracking-tight">
-            Élections & Scrutins Disponibles
-          </h1>
-
-          <p className="text-sm sm:text-base text-content-body max-w-2xl mx-auto leading-relaxed">
-            Sélectionnez l'élection de votre communauté ou organisation pour découvrir les candidats,
-            consulter leurs programmes ou déposer votre suffrage par code PIN.
-          </p>
-
-          <div className="flex justify-center pt-2">
-            <Button
-              variant="outline"
-              size="sm"
-              icon={<RefreshCw className="w-3.5 h-3.5" />}
-              onClick={fetchElections}
-              disabled={isLoading}
-            >
-              Actualiser la liste
-            </Button>
+            <div className="flex items-center gap-2 flex-shrink-0">
+              <Button
+                variant="outline"
+                size="sm"
+                icon={<RefreshCw className="w-3.5 h-3.5" />}
+                onClick={fetchElections}
+                disabled={isLoading}
+              >
+                Actualiser
+              </Button>
+            </div>
           </div>
         </div>
       </section>
 
       {/* 2. Liste des cartes d'élections */}
-      <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-10">
+      <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 sm:pt-8">
         {isLoading ? (
           <div className="py-20 text-center space-y-4">
             <RefreshCw className="w-8 h-8 animate-spin text-brand-red mx-auto" />

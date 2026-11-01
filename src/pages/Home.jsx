@@ -172,30 +172,7 @@ export const Home = ({ onNavigate, currentElection }) => {
 
 
       {/* 3. Section des candidats regroupés par poste (CDC Section 5.4) */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-6 border-b border-surface-border gap-4">
-          <div>
-            <h2 className="text-2xl font-extrabold text-content-title tracking-tight flex items-center gap-2">
-              <Users className="w-6 h-6 text-brand-red" />
-              <span>Candidats par Poste</span>
-            </h2>
-            <p className="text-sm text-content-muted mt-1">
-              Consultez les programmes et votez pour le candidat de votre choix pour chaque poste électoral.
-            </p>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              icon={<RefreshCw className="w-3.5 h-3.5" />}
-              onClick={fetchData}
-              disabled={isLoading}
-            >
-              Actualiser
-            </Button>
-          </div>
-        </div>
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 sm:pt-8">
 
         {/* Liste des candidatures ou état vide */}
         {groupedPositionsIsEmpty(groupedCandidates) ? (

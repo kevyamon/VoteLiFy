@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Button } from '../components/common/Button.jsx';
 import {
   ShieldCheck,
@@ -11,6 +11,7 @@ import {
   Users,
   Lock,
   ChevronRight,
+  ChevronDown,
 } from 'lucide-react';
 
 /**
@@ -18,6 +19,24 @@ import {
  * Présente la vision du produit, ses garanties démocratiques et guide les utilisateurs vers les élections.
  */
 export const LandingPage = ({ onNavigate }) => {
+  const [statsInView, setStatsInView] = useState(false);
+  const statsRef = useRef(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setStatsInView(entry.isIntersecting);
+      },
+      { threshold: 0.2 }
+    );
+
+    if (statsRef.current) {
+      observer.observe(statsRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
+
   const scrollToFeatures = () => {
     const el = document.getElementById('decouvrir-fonctionnalites');
     if (el) {
@@ -72,11 +91,17 @@ export const LandingPage = ({ onNavigate }) => {
             </Button>
           </div>
 
-          {/* Indicateurs clés de confiance avec police de l'accroche et animation soignée */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-8 border-t border-surface-border text-center">
+          {/* Indicateurs clés de confiance avec animation de soulèvement au défilement */}
+          <div
+            ref={statsRef}
+            className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-8 border-t border-surface-border text-center"
+          >
             <div
-              className="p-4 bg-surface-pure rounded-2xl border border-surface-border shadow-soft hover:shadow-md transition-all animate-stat-card"
-              style={{ animationDelay: '100ms' }}
+              className={`p-4 bg-surface-pure rounded-2xl border transition-all duration-500 ease-out hover:-translate-y-3.5 hover:shadow-xl hover:border-brand-red/50 ${
+                statsInView
+                  ? '-translate-y-2.5 shadow-xl border-brand-red/30'
+                  : 'translate-y-0 shadow-soft border-surface-border'
+              }`}
             >
               <span className="block text-2xl sm:text-3xl font-black text-content-title font-sans tracking-tight">
                 100 %
@@ -86,8 +111,11 @@ export const LandingPage = ({ onNavigate }) => {
               </span>
             </div>
             <div
-              className="p-4 bg-surface-pure rounded-2xl border border-surface-border shadow-soft hover:shadow-md transition-all animate-stat-card"
-              style={{ animationDelay: '200ms' }}
+              className={`p-4 bg-surface-pure rounded-2xl border transition-all duration-500 ease-out delay-100 hover:-translate-y-3.5 hover:shadow-xl hover:border-brand-blue/50 ${
+                statsInView
+                  ? '-translate-y-2.5 shadow-xl border-brand-blue/30'
+                  : 'translate-y-0 shadow-soft border-surface-border'
+              }`}
             >
               <span className="block text-2xl sm:text-3xl font-black text-brand-blue font-sans tracking-tight">
                 1 PIN = 1 Voix
@@ -97,8 +125,11 @@ export const LandingPage = ({ onNavigate }) => {
               </span>
             </div>
             <div
-              className="p-4 bg-surface-pure rounded-2xl border border-surface-border shadow-soft hover:shadow-md transition-all animate-stat-card"
-              style={{ animationDelay: '300ms' }}
+              className={`p-4 bg-surface-pure rounded-2xl border transition-all duration-500 ease-out delay-200 hover:-translate-y-3.5 hover:shadow-xl hover:border-emerald-500/50 ${
+                statsInView
+                  ? '-translate-y-2.5 shadow-xl border-emerald-500/30'
+                  : 'translate-y-0 shadow-soft border-surface-border'
+              }`}
             >
               <span className="block text-2xl sm:text-3xl font-black text-emerald-600 font-sans tracking-tight">
                 Temps Réel
@@ -108,8 +139,11 @@ export const LandingPage = ({ onNavigate }) => {
               </span>
             </div>
             <div
-              className="p-4 bg-surface-pure rounded-2xl border border-surface-border shadow-soft hover:shadow-md transition-all animate-stat-card"
-              style={{ animationDelay: '400ms' }}
+              className={`p-4 bg-surface-pure rounded-2xl border transition-all duration-500 ease-out delay-300 hover:-translate-y-3.5 hover:shadow-xl hover:border-brand-red/50 ${
+                statsInView
+                  ? '-translate-y-2.5 shadow-xl border-brand-red/30'
+                  : 'translate-y-0 shadow-soft border-surface-border'
+              }`}
             >
               <span className="block text-2xl sm:text-3xl font-black text-brand-red font-sans tracking-tight">
                 0 Tricherie
@@ -118,6 +152,22 @@ export const LandingPage = ({ onNavigate }) => {
                 Intégrité Totale
               </span>
             </div>
+          </div>
+
+          {/* Déclencheur / Flèche rouge animée pour inviter au défilement */}
+          <div className="pt-8 flex flex-col items-center justify-center">
+            <button
+              onClick={scrollToFeatures}
+              className="group flex flex-col items-center gap-2 text-content-muted hover:text-brand-red transition-all cursor-pointer focus:outline-none"
+              aria-label="Faire défiler pour mieux connaître VoteLiFy"
+            >
+              <span className="text-xs font-bold tracking-wide uppercase transition-colors group-hover:text-brand-red">
+                Mieux connaître VoteLiFy
+              </span>
+              <div className="w-9 h-9 rounded-full bg-red-50 text-brand-red flex items-center justify-center border border-red-200 shadow-sm animate-bounce group-hover:scale-110 transition-transform">
+                <ChevronDown className="w-5 h-5 stroke-[2.5]" />
+              </div>
+            </button>
           </div>
         </div>
       </section>
