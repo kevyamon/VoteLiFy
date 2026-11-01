@@ -106,6 +106,9 @@ export const ApplyCandidate = ({ onNavigate, currentElection }) => {
     setIsSubmitting(true);
 
     try {
+      const selectedPos = positions.find((p) => p._id === positionId);
+      const targetElectionId = currentElection?._id || electionInfo?._id || selectedPos?.electionId || undefined;
+
       await api.submitCandidacy({
         fullName: fullName.trim(),
         phone: phone.trim(),
@@ -113,7 +116,7 @@ export const ApplyCandidate = ({ onNavigate, currentElection }) => {
         photoUrl,
         pitch: pitch.trim(),
         videoUrl: videoUrl.trim(),
-        electionId: currentElection?._id || electionInfo?._id,
+        electionId: targetElectionId,
       });
 
       setSubmittedSuccess(true);
