@@ -40,6 +40,10 @@ export const AdminDashboard = ({ onNavigate }) => {
     try {
       const data = await api.getAllElectionsAdmin();
       setElectionsList(data || []);
+      if (!selectedElectionId && data && data.length > 0) {
+        const active = data.find((e) => e.isActive) || data[0];
+        if (active?._id) setSelectedElectionId(active._id);
+      }
     } catch (e) {
       console.error(e);
     }

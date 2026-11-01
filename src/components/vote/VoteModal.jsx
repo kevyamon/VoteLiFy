@@ -44,9 +44,10 @@ export const VoteModal = ({
     setErrorMessage('');
 
     try {
+      const cleanPin = pin.trim().toUpperCase().replace(/\s+/g, '');
       const response = await api.submitVote({
         candidateId: candidate._id,
-        pin: pin.trim().toUpperCase(),
+        pin: cleanPin,
         electionId: candidate.electionId || electionId,
       });
 
