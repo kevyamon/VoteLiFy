@@ -7,7 +7,7 @@ import { Button } from '../components/common/Button.jsx';
 import { HomeSkeleton } from '../components/common/Skeleton.jsx';
 import { HomeSeoSection } from '../components/home/HomeSeoSection.jsx';
 import { useSocketEvent } from '../services/socket.js';
-import { UserPlus, RefreshCw, Users } from 'lucide-react';
+import { UserPlus, RefreshCw, Users, Lock } from 'lucide-react';
 
 export const Home = ({ onNavigate, currentElection }) => {
   const [electionInfo, setElectionInfo] = useState(null);
@@ -57,8 +57,12 @@ export const Home = ({ onNavigate, currentElection }) => {
     fetchData();
   };
 
-  const isVotingOpen = electionInfo?.voting?.isOpen;
-  const isCandidacyOpen = electionInfo?.candidacies?.isOpen;
+  const isVotingOpen = electionInfo?.voting !== undefined
+    ? Boolean(electionInfo.voting?.isOpen)
+    : Boolean(currentElection?.voting?.isOpen);
+  const isCandidacyOpen = electionInfo?.candidacies !== undefined
+    ? Boolean(electionInfo.candidacies?.isOpen)
+    : Boolean(currentElection?.candidacies?.isOpen);
 
   // Calcul de la cible pour le compte à rebours
   const countdownTarget = isVotingOpen
@@ -89,31 +93,37 @@ export const Home = ({ onNavigate, currentElection }) => {
   return (
     <main className="flex-1 pb-16">
       {/* 1. Bannière de présentation officielle du scrutin */}
-      <section className="bg-gradient-to-b from-surface-subtle to-surface-base border-b border-surface-border py-10 md:py-14">
+      <section className="bg-gradient-to-b from-surface-subtle to-surface-base border-b border-surface-border py-8 md:py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6">
-          {/* Bouton retour vers toutes les élections */}
-          <div className="flex justify-center">
+          {/* Bannière grand format de l'élection (Illustration / Monogramme immersif) */}
+          <div className="relative w-full max-w-4xl mx-auto h-48 sm:h-64 rounded-3xl overflow-hidden shadow-card border border-surface-border">
+            {electionImageUrl ? (
+              <img
+                src={electionImageUrl}
+                alt={rawTitle}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div className="w-full h-full bg-gradient-to-br from-brand-red via-red-600 to-brand-blue flex items-center justify-center relative overflow-hidden">
+                <div className="absolute inset-0 bg-black/10 backdrop-blur-[1px]" />
+                <span className="relative text-6xl sm:text-7xl font-black text-white/90 tracking-widest drop-shadow-lg select-none">
+                  {initials}
+                </span>
+              </div>
+            )}
+
+            {/* Dégradé doux pour le contraste des éléments superposés */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/30 pointer-events-none" />
+
+            {/* Bouton retour vers toutes les élections (Glassmorphic) */}
             <button
               onClick={() => onNavigate('elections')}
-              className="inline-flex items-center gap-1.5 text-xs font-semibold text-content-muted hover:text-brand-red transition-colors"
+              className="absolute top-4 left-4 z-10 inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-surface-pure/90 hover:bg-surface-pure text-content-title text-xs font-bold shadow-sm backdrop-blur-md border border-white/50 transition-all hover:scale-[1.02]"
             >
-              <Users className="w-4 h-4" />
-              <span>← Voir toutes les élections</span>
+              <Users className="w-3.5 h-3.5 text-brand-red" />
+              <span>Voir toutes les élections</span>
             </button>
           </div>
-
-          {/* Illustration ou Monogramme élégant de l'élection */}
-          {electionImageUrl ? (
-            <img
-              src={electionImageUrl}
-              alt={rawTitle}
-              className="w-20 h-20 rounded-2xl object-cover shadow-md mx-auto border-2 border-white"
-            />
-          ) : (
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-brand-red via-brand-red to-brand-blue text-white flex items-center justify-center font-black text-2xl tracking-wider shadow-md mx-auto border-2 border-white">
-              <span>{initials}</span>
-            </div>
-          )}
 
           <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold text-content-title tracking-tight max-w-4xl mx-auto leading-tight">
             <span className="block">{line1}</span>
@@ -127,9 +137,9 @@ export const Home = ({ onNavigate, currentElection }) => {
               'Exprimez votre voix en toute confidentialité grâce à votre code PIN individuel secret et participez activement à la gouvernance de notre communauté.'}
           </p>
 
-          {/* Bouton pour candidater si période ouverte */}
-          {isCandidacyOpen && (
-            <div className="flex justify-center pt-1">
+          {/* Bouton pour candidater ou état explicite si candidatures closes */}
+          <div className="flex flex-col items-center justify-center pt-1 gap-2">
+            {isCandidacyOpen ? (
               <Button
                 variant="primary"
                 size="md"
@@ -138,8 +148,18 @@ export const Home = ({ onNavigate, currentElection }) => {
               >
                 Déposer ma candidature
               </Button>
-            </div>
-          )}
+            ) : (
+              <div className="flex flex-col items-center gap-1.5 p-3.5 rounded-2xl bg-surface-subtle border border-surface-border max-w-md w-full shadow-sm">
+                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-slate-200/80 border border-slate-300 text-slate-700 text-xs font-bold select-none">
+                  <Lock className="w-3.5 h-3.5 text-slate-500" />
+                  <span>Dépôt des candidatures clos</span>
+                </div>
+                <p className="text-[11px] text-content-muted text-center">
+                  La période officielle de réception des dossiers est actuellement fermée pour ce scrutin.
+                </p>
+              </div>
+            )}
+          </div>
 
           {/* 2. Bloc Compte à rebours dynamique (affiché uniquement si une cible est fixée) */}
           {countdownTarget && (

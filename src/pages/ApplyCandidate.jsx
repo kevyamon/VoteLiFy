@@ -6,6 +6,7 @@ import { CustomSelect } from '../components/common/CustomSelect.jsx';
 import { useToast } from '../context/ToastContext.jsx';
 import { ApplySuccessState } from '../components/candidate/ApplySuccessState.jsx';
 import { ApplySkeleton } from '../components/common/Skeleton.jsx';
+import { useSocketEvent } from '../services/socket.js';
 import {
   ArrowLeft,
   Upload,
@@ -63,6 +64,13 @@ export const ApplyCandidate = ({ onNavigate, currentElection }) => {
     fetchPrerequisites();
   }, [currentElection?._id]);
 
+  // Synchronisation temps réel si l'administrateur ouvre ou ferme les candidatures
+  useSocketEvent('ELECTION_UPDATED', (updatedElection) => {
+    if (updatedElection && (updatedElection._id === currentElection?._id || updatedElection._id === electionInfo?._id)) {
+      setElectionInfo(updatedElection);
+    }
+  });
+
   // Conversion de la photo locale en Data URL pour téléversement autonome
   const handlePhotoUpload = (e) => {
     const file = e.target.files?.[0];
@@ -117,7 +125,9 @@ export const ApplyCandidate = ({ onNavigate, currentElection }) => {
     }
   };
 
-  const isCandidacyOpen = currentElection?.candidacies?.isOpen ?? electionInfo?.candidacies?.isOpen;
+  const isCandidacyOpen = electionInfo?.candidacies !== undefined
+    ? Boolean(electionInfo.candidacies?.isOpen)
+    : Boolean(currentElection?.candidacies?.isOpen);
 
   if (isLoading) {
     return <ApplySkeleton />;
@@ -145,9 +155,9 @@ export const ApplyCandidate = ({ onNavigate, currentElection }) => {
           <Button
             variant="outline"
             icon={<ArrowLeft className="w-4 h-4" />}
-            onClick={() => onNavigate('home')}
+            onClick={() => onNavigate('election')}
           >
-            Retourner à l’accueil
+            Retourner au scrutin
           </Button>
         </div>
       </main>

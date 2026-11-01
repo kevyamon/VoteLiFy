@@ -132,56 +132,61 @@ export const ElectionsPage = ({ onNavigate, onSelectElection }) => {
                 <article
                   key={election._id}
                   onClick={() => handleCardClick(election)}
-                  className="group relative bg-surface-pure rounded-3xl border border-surface-border p-6 sm:p-8 shadow-soft hover:shadow-xl hover:border-brand-red/40 transition-all duration-300 flex flex-col justify-between cursor-pointer space-y-6"
+                  className="group relative bg-surface-pure rounded-3xl border border-surface-border overflow-hidden shadow-soft hover:shadow-xl hover:border-brand-red/40 transition-all duration-300 flex flex-col justify-between cursor-pointer"
                 >
-                  <div className="space-y-5">
-                    {/* En-tête de carte avec Monogramme (2 premières lettres) et Badge de statut */}
-                    <div className="flex items-start justify-between gap-3">
-                      {/* Illustration : Image si présente, sinon deux premières lettres du nom dans un avatar stylisé */}
-                      {election.imageUrl ? (
-                        <img
-                          src={election.imageUrl}
-                          alt={election.title}
-                          className="w-16 h-16 sm:w-18 sm:h-18 rounded-2xl object-cover shadow-md group-hover:scale-105 transition-transform flex-shrink-0 border-2 border-white"
-                        />
-                      ) : (
-                        <div className="w-16 h-16 sm:w-18 sm:h-18 rounded-2xl bg-gradient-to-br from-brand-red via-brand-red to-brand-blue text-white flex items-center justify-center font-black text-2xl tracking-wider shadow-md group-hover:scale-105 transition-transform flex-shrink-0 border-2 border-white">
-                          <span>{election.initials || 'EL'}</span>
-                        </div>
-                      )}
-
-                      {/* Badge de statut temps réel */}
-                      <div className="flex-shrink-0">
-                        {isVotingOpen ? (
-                          <Badge variant="success" dot={true} size="sm">
-                            Vote en cours
-                          </Badge>
-                        ) : isCandidacyOpen ? (
-                          <Badge variant="info" dot={true} size="sm">
-                            Candidatures ouvertes
-                          </Badge>
-                        ) : isResultsPublished ? (
-                          <Badge variant="info" dot={false} size="sm">
-                            Résultats proclamés
-                          </Badge>
-                        ) : hasDates && new Date() > new Date(election.voting?.endAt) ? (
-                          <Badge variant="neutral" dot={false} size="sm">
-                            Scrutin clos
-                          </Badge>
-                        ) : (
-                          <Badge variant="neutral" dot={false} size="sm">
-                            En préparation
-                          </Badge>
-                        )}
+                  {/* 1. Visuel d'en-tête immersif couvrant toute la largeur supérieure */}
+                  <div className="relative w-full h-44 sm:h-48 overflow-hidden bg-slate-900">
+                    {election.imageUrl ? (
+                      <img
+                        src={election.imageUrl}
+                        alt={election.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-gradient-to-br from-brand-red via-red-600 to-brand-blue flex items-center justify-center relative overflow-hidden group-hover:scale-105 transition-transform duration-500">
+                        <div className="absolute inset-0 bg-black/10 backdrop-blur-[1px]" />
+                        <span className="relative text-4xl sm:text-5xl font-black text-white/90 tracking-widest drop-shadow-md select-none">
+                          {election.initials || 'EL'}
+                        </span>
                       </div>
-                    </div>
+                    )}
 
-                    {/* Nom et Description de l'élection */}
+                    {/* Dégradé doux de protection visuelle */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/25 pointer-events-none" />
+
+                    {/* Badge de statut flottant */}
+                    <div className="absolute top-3.5 right-3.5 z-10 backdrop-blur-md bg-white/95 rounded-full shadow-sm">
+                      {isVotingOpen ? (
+                        <Badge variant="success" dot={true} size="sm">
+                          Vote en cours
+                        </Badge>
+                      ) : isCandidacyOpen ? (
+                        <Badge variant="info" dot={true} size="sm">
+                          Candidatures ouvertes
+                        </Badge>
+                      ) : isResultsPublished ? (
+                        <Badge variant="info" dot={false} size="sm">
+                          Résultats proclamés
+                        </Badge>
+                      ) : hasDates && new Date() > new Date(election.voting?.endAt) ? (
+                        <Badge variant="neutral" dot={false} size="sm">
+                          Scrutin clos
+                        </Badge>
+                      ) : (
+                        <Badge variant="neutral" dot={false} size="sm">
+                          En préparation
+                        </Badge>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* 2. Contenu descriptif et actions */}
+                  <div className="p-5 sm:p-6 flex-1 flex flex-col justify-between space-y-4">
                     <div className="space-y-2">
                       <h2 className="text-xl sm:text-2xl font-extrabold text-content-title tracking-tight group-hover:text-brand-red transition-colors leading-snug">
                         {election.title}
                       </h2>
-                      <p className="text-xs sm:text-sm text-content-body line-clamp-3 leading-relaxed">
+                      <p className="text-xs sm:text-sm text-content-body line-clamp-2 leading-relaxed">
                         {election.description ||
                           'Scrutin officiel de la communauté pour le renouvellement des représentants.'}
                       </p>
@@ -206,24 +211,24 @@ export const ElectionsPage = ({ onNavigate, onSelectElection }) => {
                         </div>
                       </div>
                     )}
-                  </div>
 
-                  {/* Bouton d'accès centré */}
-                  <div className="pt-2 border-t border-surface-border flex items-center justify-between">
-                    <span className="text-xs font-bold text-brand-red group-hover:translate-x-1 transition-transform inline-flex items-center gap-1">
-                      <span>Accéder au scrutin</span>
-                      <ArrowRight className="w-3.5 h-3.5" />
-                    </span>
-                    <Button
-                      variant="primary"
-                      size="sm"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleCardClick(election);
-                      }}
-                    >
-                      Participer
-                    </Button>
+                    {/* Bouton d'accès centré */}
+                    <div className="pt-3 border-t border-surface-border flex items-center justify-between">
+                      <span className="text-xs font-bold text-brand-red group-hover:translate-x-1 transition-transform inline-flex items-center gap-1">
+                        <span>Accéder au scrutin</span>
+                        <ArrowRight className="w-3.5 h-3.5" />
+                      </span>
+                      <Button
+                        variant="primary"
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleCardClick(election);
+                        }}
+                      >
+                        Participer
+                      </Button>
+                    </div>
                   </div>
                 </article>
               );

@@ -16,19 +16,46 @@ import { useSocketEvent } from './services/socket.js';
 function MainApp() {
   const { isAuthenticated } = useAuth();
 
-  // Résolution de la vue active depuis le hash URL
+  // Résolution robuste de la vue active depuis le hash URL ou chemin
   const getPageFromHash = () => {
     if (typeof window === 'undefined') return 'home';
-    const hash = window.location.hash.replace(/^#/, '');
+    const hash = window.location.hash.replace(/^#\/?/, '').split('?')[0].split('/')[0];
+    const path = window.location.pathname.replace(/^\//, '').split('?')[0].split('/')[0];
+    const candidate = hash || path;
     const validPages = ['home', 'elections', 'election', 'apply', 'results', 'admin'];
-    return validPages.includes(hash) ? hash : 'home';
+    return validPages.includes(candidate) ? candidate : 'home';
   };
 
   const [currentPage, setCurrentPage] = useState(getPageFromHash);
-  const [selectedElection, setSelectedElection] = useState(null);
+
+  // Persistance de l'élection sélectionnée dans localStorage pour survivre aux actualisations F5
+  const [selectedElection, setSelectedElection] = useState(() => {
+    if (typeof window === 'undefined') return null;
+    try {
+      const stored = localStorage.getItem('votelify_selected_election');
+      return stored ? JSON.parse(stored) : null;
+    } catch {
+      return null;
+    }
+  });
+
+  const handleSelectElection = (election) => {
+    setSelectedElection(election);
+    if (typeof window !== 'undefined') {
+      try {
+        if (election) {
+          localStorage.setItem('votelify_selected_election', JSON.stringify(election));
+        } else {
+          localStorage.removeItem('votelify_selected_election');
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+  };
+
   const [electionInfo, setElectionInfo] = useState(null);
   const [adminAuthModalOpen, setAdminAuthModalOpen] = useState(false);
-
 
   // Fonction universelle de réinitialisation absolue du scroll en haut
   const scrollToTopMobileStyle = () => {
@@ -56,40 +83,32 @@ function MainApp() {
 
   // Navigation synchronisée avec l'historique du téléphone (bouton Retour physique/geste)
   const navigateTo = (page, replace = false) => {
-    if (page === currentPage) return;
     if (typeof window !== 'undefined') {
+      const targetHash = `#${page}`;
       if (replace) {
-        window.history.replaceState({ page }, '', `#${page}`);
+        window.history.replaceState({ page }, '', targetHash);
       } else {
-        window.history.pushState({ page }, '', `#${page}`);
+        window.history.pushState({ page }, '', targetHash);
       }
     }
     setCurrentPage(page);
     scrollToTopMobileStyle();
   };
 
-  // Écoute du geste / bouton Retour du téléphone mobile avec retour immédiat tout en haut
+  // Écoute du geste / bouton Retour du téléphone mobile et changements de hash
   useEffect(() => {
-    const handlePopState = (e) => {
-      const targetPage = e.state?.page || getPageFromHash();
+    const handleUrlChange = (e) => {
+      const targetPage = e?.state?.page || getPageFromHash();
       setCurrentPage(targetPage);
-
-      // Force le scroll tout en haut immédiatement pour contrer la restauration auto du navigateur
       scrollToTopMobileStyle();
-      requestAnimationFrame(scrollToTopMobileStyle);
-      const t1 = setTimeout(scrollToTopMobileStyle, 20);
-      const t2 = setTimeout(scrollToTopMobileStyle, 80);
-      const t3 = setTimeout(scrollToTopMobileStyle, 160);
-
-      return () => {
-        clearTimeout(t1);
-        clearTimeout(t2);
-        clearTimeout(t3);
-      };
     };
 
-    window.addEventListener('popstate', handlePopState);
-    return () => window.removeEventListener('popstate', handlePopState);
+    window.addEventListener('popstate', handleUrlChange);
+    window.addEventListener('hashchange', handleUrlChange);
+    return () => {
+      window.removeEventListener('popstate', handleUrlChange);
+      window.removeEventListener('hashchange', handleUrlChange);
+    };
   }, []);
 
   const fetchElectionInfo = async () => {
@@ -106,7 +125,17 @@ function MainApp() {
   }, [currentPage]);
 
   // Synchronisation temps réel WebSocket pour les paramètres globaux et le scrutin
-  useSocketEvent('ELECTION_UPDATED', fetchElectionInfo);
+  useSocketEvent('ELECTION_UPDATED', (updatedElection) => {
+    fetchElectionInfo();
+    if (updatedElection?._id && selectedElection?._id === updatedElection._id) {
+      setSelectedElection(updatedElection);
+      try {
+        localStorage.setItem('votelify_selected_election', JSON.stringify(updatedElection));
+      } catch (err) {
+        console.error(err);
+      }
+    }
+  });
   useSocketEvent('ELECTION_RESET', fetchElectionInfo);
 
   // Réinitialisation instantanée et absolue du scroll en haut à chaque changement de page
@@ -171,7 +200,7 @@ function MainApp() {
       {currentPage === 'elections' && (
         <ElectionsPage
           onNavigate={navigateTo}
-          onSelectElection={setSelectedElection}
+          onSelectElection={handleSelectElection}
         />
       )}
       {currentPage === 'election' && (
