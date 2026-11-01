@@ -5,30 +5,33 @@ import { Button } from '../common/Button.jsx';
 import { Badge } from '../common/Badge.jsx';
 import { CustomSelect } from '../common/CustomSelect.jsx';
 import { AdminVotersSkeleton } from '../common/Skeleton.jsx';
+import { ConfirmModal } from '../common/ConfirmModal.jsx';
 import { useToast } from '../../context/ToastContext.jsx';
-import { VoterPreviewModal, VoterGeneratedPinsModal } from './AdminVoterModals.jsx';
+import { AdminVoterImportSection } from './AdminVoterImportSection.jsx';
+import { VoterRegeneratedPinModal } from './AdminVoterModals.jsx';
 import {
   Users,
-  Upload,
   Download,
   Search,
   RefreshCw,
+  KeyRound,
+  Trash2,
 } from 'lucide-react';
 
 export const AdminVotersTab = () => {
-  const [rawText, setRawText] = useState('');
-  const [previewData, setPreviewData] = useState(null);
-  const [isPreviewing, setIsPreviewing] = useState(false);
-  const [isImporting, setIsImporting] = useState(false);
-  const [generatedBatch, setGeneratedBatch] = useState(null);
-
   // Registre des électeurs
   const [voters, setVoters] = useState([]);
   const [pagination, setPagination] = useState({ page: 1, limit: 20, totalPages: 1 });
   const [search, setSearch] = useState('');
   const [filterVoted, setFilterVoted] = useState('');
   const [isLoadingList, setIsLoadingList] = useState(false);
-  const [copiedPhone, setCopiedPhone] = useState(null);
+
+  // Suppression et Régénération PIN
+  const [voterToDelete, setVoterToDelete] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [regeneratedData, setRegeneratedData] = useState(null);
+  const [isRegenerating, setIsRegenerating] = useState(false);
+  const [copiedRegenerated, setCopiedRegenerated] = useState(false);
 
   const toast = useToast();
 
@@ -58,45 +61,6 @@ export const AdminVotersTab = () => {
   useSocketEvent('VOTERS_IMPORTED', () => loadVoters(1));
   useSocketEvent('ELECTION_RESET', () => loadVoters(1));
 
-  const handlePreview = async () => {
-    if (!rawText.trim()) {
-      toast.error('Veuillez coller au moins un numéro de téléphone.');
-      return;
-    }
-    setIsPreviewing(true);
-    try {
-      const data = await api.previewVoters({ rawText });
-      setPreviewData(data);
-    } catch (err) {
-      toast.error(err.message || 'Erreur lors de l’analyse des numéros.');
-    } finally {
-      setIsPreviewing(false);
-    }
-  };
-
-  const handleConfirmImport = async () => {
-    setIsImporting(true);
-    try {
-      const result = await api.importVoters({ rawText });
-      setGeneratedBatch(result.votersWithPin || []);
-      setPreviewData(null);
-      setRawText('');
-      toast.success(`${result.importedCount} électeur(s) importé(s) avec succès.`);
-      loadVoters(1);
-    } catch (err) {
-      toast.error(err.message || 'Échec lors de l’importation.');
-    } finally {
-      setIsImporting(false);
-    }
-  };
-
-  const copyWhatsAppMessage = (text, phone) => {
-    navigator.clipboard.writeText(text);
-    setCopiedPhone(phone);
-    toast.success(`Message copié pour le ${phone}`);
-    setTimeout(() => setCopiedPhone(null), 2500);
-  };
-
   const handleExport = async () => {
     try {
       const data = await api.exportVoters();
@@ -113,75 +77,47 @@ export const AdminVotersTab = () => {
     }
   };
 
+  const handleConfirmDelete = async () => {
+    if (!voterToDelete) return;
+    setIsDeleting(true);
+    try {
+      await api.deleteVoter(voterToDelete._id);
+      toast.success(`Électeur ${voterToDelete.phone} supprimé de la liste.`);
+      setVoterToDelete(null);
+      loadVoters(pagination.page);
+    } catch (err) {
+      toast.error(err.message || 'Impossible de supprimer cet électeur.');
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const handleRegeneratePin = async (voter) => {
+    setIsRegenerating(true);
+    try {
+      const res = await api.regenerateVoterPin(voter._id);
+      setRegeneratedData(res);
+      setCopiedRegenerated(false);
+      toast.success(`Nouveau code PIN généré pour ${voter.phone}.`);
+    } catch (err) {
+      toast.error(err.message || 'Impossible de régénérer le code PIN.');
+    } finally {
+      setIsRegenerating(false);
+    }
+  };
+
+  const handleCopyRegenerated = (text) => {
+    navigator.clipboard.writeText(text);
+    setCopiedRegenerated(true);
+    toast.success('Message WhatsApp copié dans le presse-papier !');
+  };
+
   return (
     <div className="space-y-8 animate-fade-in">
-      {/* 1. Zone d'import des numéros WhatsApp (CDC Section 7.2) */}
-      <div className="bg-surface-pure rounded-2xl border border-surface-border p-4 sm:p-6 shadow-soft space-y-4">
-        <div className="flex items-center gap-3 pb-3 border-b border-surface-border">
-          <div className="p-2 bg-brand-red-light text-brand-red rounded-xl">
-            <Upload className="w-5 h-5" />
-          </div>
-          <div>
-            <h3 className="text-lg font-bold text-content-title">Importer des électeurs & Générer les PINs</h3>
-            <p className="text-xs text-content-muted">
-              Collez la liste brute des numéros des membres WhatsApp (un par ligne ou séparés par des virgules).
-            </p>
-          </div>
-        </div>
+      {/* 1. Zone d'import des numéros WhatsApp */}
+      <AdminVoterImportSection onImportSuccess={() => loadVoters(1)} />
 
-        <textarea
-          rows={4}
-          value={rawText}
-          onChange={(e) => setRawText(e.target.value)}
-          placeholder={`+2250700000000\n+225 05 11 22 33 44\n0102030405`}
-          className="w-full p-3.5 bg-surface-base border border-surface-border rounded-xl text-xs font-mono focus:border-brand-red focus:ring-2 focus:ring-brand-red/20 focus:outline-none leading-relaxed"
-        />
-
-        <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
-          <span className="text-xs text-content-muted">
-            Format supporté : international (+225...) ou local 10 chiffres (détection automatique).
-          </span>
-
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              isLoading={isPreviewing}
-              onClick={handlePreview}
-            >
-              Prévisualiser l'analyse
-            </Button>
-
-            <Button
-              variant="primary"
-              size="sm"
-              isLoading={isImporting}
-              disabled={!rawText.trim()}
-              onClick={handleConfirmImport}
-            >
-              Importer & Générer les PINs
-            </Button>
-          </div>
-        </div>
-      </div>
-
-      {/* Modale de rapport de prévisualisation (CDC Section 7.3) */}
-      <VoterPreviewModal
-        previewData={previewData}
-        onClose={() => setPreviewData(null)}
-        onConfirmImport={handleConfirmImport}
-        isImporting={isImporting}
-      />
-
-      {/* Modale d'affichage des PINs fraîchement générés (CDC Section 7.5 & 7.7) */}
-      <VoterGeneratedPinsModal
-        generatedBatch={generatedBatch}
-        onClose={() => setGeneratedBatch(null)}
-        copiedPhone={copiedPhone}
-        onCopyWhatsAppMessage={copyWhatsAppMessage}
-      />
-
-      {/* 2. Registre des Électeurs (CDC Section 7.6) */}
+      {/* 2. Registre des Électeurs */}
       <div className="bg-surface-pure rounded-2xl border border-surface-border p-4 sm:p-6 shadow-soft space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
@@ -242,7 +178,7 @@ export const AdminVotersTab = () => {
           />
         </div>
 
-        {/* Tableau scrollable horizontalement sur mobile sans casser la mise en page */}
+        {/* Tableau scrollable */}
         <div className="overflow-x-auto rounded-xl border border-surface-border">
           <table className="w-full min-w-[540px] text-left text-xs">
             <thead className="bg-surface-subtle border-b border-surface-border text-content-muted uppercase tracking-wider text-[10px]">
@@ -251,6 +187,7 @@ export const AdminVotersTab = () => {
                 <th className="px-4 py-3 font-bold">Statut de Vote</th>
                 <th className="px-4 py-3 font-bold">Date d'émargement</th>
                 <th className="px-4 py-3 font-bold">Statut PIN</th>
+                <th className="px-4 py-3 font-bold text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-surface-border bg-surface-pure font-medium">
@@ -258,7 +195,7 @@ export const AdminVotersTab = () => {
                 <AdminVotersSkeleton />
               ) : voters.length === 0 ? (
                 <tr>
-                  <td colSpan={4} className="px-4 py-8 text-center text-content-muted">
+                  <td colSpan={5} className="px-4 py-8 text-center text-content-muted">
                     Aucun électeur trouvé pour ces critères.
                   </td>
                 </tr>
@@ -282,6 +219,31 @@ export const AdminVotersTab = () => {
                     </td>
                     <td className="px-4 py-3">
                       <span className="text-[11px] text-slate-500 font-medium">Actif</span>
+                    </td>
+                    <td className="px-4 py-3 text-right">
+                      {v.hasVoted ? (
+                        <span className="text-[11px] text-content-muted italic">Émargement scellé</span>
+                      ) : (
+                        <div className="flex items-center justify-end gap-1.5">
+                          <button
+                            type="button"
+                            title="Générer un nouveau code PIN"
+                            onClick={() => handleRegeneratePin(v)}
+                            disabled={isRegenerating}
+                            className="p-1.5 rounded-lg bg-blue-50 text-brand-blue hover:bg-blue-100 transition-colors"
+                          >
+                            <KeyRound className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            type="button"
+                            title="Supprimer cet électeur"
+                            onClick={() => setVoterToDelete(v)}
+                            className="p-1.5 rounded-lg bg-red-50 text-brand-red hover:bg-red-100 transition-colors"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      )}
                     </td>
                   </tr>
                 ))
@@ -317,6 +279,30 @@ export const AdminVotersTab = () => {
           </div>
         )}
       </div>
+
+      {/* Modale de confirmation de suppression d'électeur */}
+      <ConfirmModal
+        isOpen={Boolean(voterToDelete)}
+        title="Supprimer cet électeur ?"
+        message={
+          voterToDelete
+            ? `Êtes-vous certain de vouloir retirer l'électeur ${voterToDelete.phone} de la liste électorale ? Son code PIN sera définitivement révoqué.`
+            : ''
+        }
+        confirmText="Supprimer de la liste"
+        confirmVariant="danger"
+        isLoading={isDeleting}
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setVoterToDelete(null)}
+      />
+
+      {/* Modale de restitution du nouveau code PIN régénéré */}
+      <VoterRegeneratedPinModal
+        data={regeneratedData}
+        onClose={() => setRegeneratedData(null)}
+        copied={copiedRegenerated}
+        onCopy={handleCopyRegenerated}
+      />
     </div>
   );
 };

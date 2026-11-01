@@ -159,6 +159,9 @@ export const AdminVotersSkeleton = () => (
         <td className="px-4 py-3.5">
           <SkeletonBox className="h-4 w-16 rounded" />
         </td>
+        <td className="px-4 py-3.5 text-right">
+          <SkeletonBox className="h-6 w-14 ml-auto rounded-lg" />
+        </td>
       </tr>
     ))}
   </>

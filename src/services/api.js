@@ -115,6 +115,8 @@ export const api = {
     return request(`/admin/voters${query ? `?${query}` : ''}`);
   },
   exportVoters: () => request('/admin/voters/export'),
+  deleteVoter: (id) => request(`/admin/voters/${id}`, { method: 'DELETE' }),
+  regenerateVoterPin: (id) => request(`/admin/voters/${id}/regenerate-pin`, { method: 'POST' }),
 
   // Modération des candidatures
   getAllCandidatesAdmin: (params = {}) => {

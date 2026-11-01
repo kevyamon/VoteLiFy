@@ -124,3 +124,63 @@ export const VoterGeneratedPinsModal = ({
     </Modal>
   );
 };
+
+/**
+ * Modale d'affichage du nouveau code PIN régénéré pour un électeur individuel.
+ */
+export const VoterRegeneratedPinModal = ({
+  data,
+  onClose,
+  copied,
+  onCopy,
+}) => {
+  if (!data) return null;
+
+  return (
+    <Modal
+      isOpen={Boolean(data)}
+      onClose={onClose}
+      title="Nouveau code PIN généré avec succès"
+      maxWidth="max-w-md"
+    >
+      <div className="space-y-4 text-xs">
+        <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-2xl text-center space-y-2">
+          <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-800 block">
+            Électeur : {data.phone}
+          </span>
+          <div className="inline-block px-4 py-2 bg-white rounded-xl border border-emerald-300 shadow-sm">
+            <span className="font-mono text-xl sm:text-2xl font-black text-content-title tracking-wider">
+              {data.newPin}
+            </span>
+          </div>
+          <p className="text-[11px] text-emerald-700">
+            Ce code est actif et remplace tout code précédent.
+          </p>
+        </div>
+
+        <div className="space-y-2">
+          <span className="text-xs font-bold text-content-title block">
+            Message WhatsApp officiel prêt à l'envoi :
+          </span>
+          <pre className="p-3 bg-surface-subtle border border-surface-border rounded-xl text-[11px] font-mono whitespace-pre-wrap text-content-body max-h-36 overflow-y-auto">
+            {data.message}
+          </pre>
+        </div>
+
+        <div className="pt-2 flex justify-end gap-2">
+          <Button variant="outline" size="sm" onClick={onClose}>
+            Fermer
+          </Button>
+          <Button
+            variant="primary"
+            size="sm"
+            icon={copied ? <Check className="w-4 h-4 text-white" /> : <Copy className="w-4 h-4" />}
+            onClick={() => onCopy(data.message)}
+          >
+            {copied ? 'Copié !' : 'Copier le message'}
+          </Button>
+        </div>
+      </div>
+    </Modal>
+  );
+};
