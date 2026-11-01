@@ -2,18 +2,95 @@
 <html lang="fr" class="min-h-screen bg-surface-base">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/png" href="/logo.png" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <meta name="theme-color" content="#f20411" />
-    <meta name="description" content="Plateforme numérique de vote sécurisé, de gestion des candidatures et de proclamation certifiée." />
-    <link rel="manifest" href="/manifest.json" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
     
+    <!-- Titre Stratégique SEO Principal -->
+    <title>VoteLiFy — Plateforme Officielle de Vote Sécurisé &amp; Élections en Ligne</title>
+
+    <!-- Méta-tags Essentiels d'Indexation et Référencement Google -->
+    <meta name="description" content="VoteLiFy est la plateforme numérique officielle de vote électronique sécurisé par code PIN secret, de modération des candidatures et de dépouillement certifié en temps réel." />
+    <meta name="keywords" content="VoteLiFy, votelify, vote en ligne, vote électronique, plateforme électorale, élection des responsables, dépouillement certifié, scrutin secret, vote par code PIN, élection sécurisée, commission électorale" />
+    <meta name="author" content="VoteLiFy" />
+    <meta name="publisher" content="VoteLiFy Commission Électorale" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    <meta name="googlebot" content="index, follow" />
+    <link rel="canonical" href="https://votelify.vercel.app/" />
+
+    <!-- Balise d'authentification Google Search Console (Remplir avec votre code de validation) -->
+    <meta name="google-site-verification" content="VOTELIFY_GOOGLE_SEARCH_CONSOLE_VERIFICATION_TOKEN" />
+
+    <!-- Identité Visuelle, PWA & Navigateurs -->
+    <link rel="icon" type="image/png" href="/logo.png" />
+    <link rel="apple-touch-icon" href="/logo.png" />
+    <meta name="theme-color" content="#f20411" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="VoteLiFy" />
+    <link rel="manifest" href="/manifest.json" />
+
+    <!-- Open Graph / Facebook / LinkedIn / WhatsApp -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="VoteLiFy" />
+    <meta property="og:url" content="https://votelify.vercel.app/" />
+    <meta property="og:title" content="VoteLiFy — Plateforme Officielle de Vote Sécurisé &amp; Élections" />
+    <meta property="og:description" content="Votez en toute confidentialité avec votre code PIN secret individuel et découvrez le dépouillement officiel en direct sur VoteLiFy." />
+    <meta property="og:image" content="https://votelify.vercel.app/logo.png" />
+    <meta property="og:image:alt" content="VoteLiFy — Plateforme officielle de vote sécurisé" />
+    <meta property="og:locale" content="fr_FR" />
+
+    <!-- Twitter Card / X -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content="https://votelify.vercel.app/" />
+    <meta name="twitter:title" content="VoteLiFy — Plateforme Officielle de Vote Sécurisé" />
+    <meta name="twitter:description" content="Plateforme numérique officielle de vote sécurisé par code PIN et de proclamation certifiée." />
+    <meta name="twitter:image" content="https://votelify.vercel.app/logo.png" />
+
     <!-- Typographie Moderne Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet" />
 
-    <title>VoteLiFy (VLF) — Plateforme Électorale Sécurisée</title>
+    <!-- Données Structurées JSON-LD (Schema.org) pour Rich Snippets Google -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebSite",
+          "@id": "https://votelify.vercel.app/#website",
+          "url": "https://votelify.vercel.app/",
+          "name": "VoteLiFy",
+          "alternateName": ["VLF", "Votelify", "VoteLiFy Platform"],
+          "description": "Plateforme officielle de vote électronique sécurisé et de dépouillement certifié en temps réel.",
+          "inLanguage": "fr-FR"
+        },
+        {
+          "@type": "Organization",
+          "@id": "https://votelify.vercel.app/#organization",
+          "name": "VoteLiFy",
+          "url": "https://votelify.vercel.app/",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://votelify.vercel.app/logo.png"
+          }
+        },
+        {
+          "@type": "SoftwareApplication",
+          "@id": "https://votelify.vercel.app/#application",
+          "name": "VoteLiFy",
+          "applicationCategory": "SecurityApplication, BusinessApplication",
+          "operatingSystem": "All",
+          "browserRequirements": "Requires JavaScript. Requires HTML5.",
+          "description": "Solution officielle d'élections numériques avec vote par code PIN individuel secret et traçabilité inviolable.",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "EUR"
+          }
+        }
+      ]
+    }
+    </script>
   </head>
   <body class="min-h-screen text-slate-800 antialiased selection:bg-brand-red selection:text-white">
     <div id="root" class="min-h-screen flex flex-col"></div>

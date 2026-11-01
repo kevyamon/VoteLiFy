@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../../services/api.js';
+import { useSocketEvent } from '../../services/socket.js';
 import { Button } from '../common/Button.jsx';
 import { useToast } from '../../context/ToastContext.jsx';
 import { BarChart3, RefreshCw, Users, CheckCircle2, Award } from 'lucide-react';
@@ -25,6 +26,10 @@ export const AdminTallyTab = () => {
   useEffect(() => {
     loadTally();
   }, []);
+
+  // Surveillance en direct du dépouillement
+  useSocketEvent('VOTE_CAST', loadTally);
+  useSocketEvent('ELECTION_RESET', loadTally);
 
   const part = tallyData?.participation;
 

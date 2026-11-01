@@ -4,6 +4,7 @@ import { Button } from '../components/common/Button.jsx';
 import { Badge } from '../components/common/Badge.jsx';
 import { CountdownTimer } from '../components/common/CountdownTimer.jsx';
 import { ResultsSkeleton } from '../components/common/Skeleton.jsx';
+import { useSocketEvent } from '../services/socket.js';
 import {
   Award,
   ArrowLeft,
@@ -43,6 +44,11 @@ export const ResultsPage = ({ onNavigate }) => {
     fetchResults();
   }, []);
 
+  // Synchronisation temps réel automatique
+  useSocketEvent('ELECTION_UPDATED', fetchResults);
+  useSocketEvent('VOTE_CAST', fetchResults);
+  useSocketEvent('ELECTION_RESET', fetchResults);
+
   if (isLoading) {
     return <ResultsSkeleton />;
   }
@@ -51,6 +57,13 @@ export const ResultsPage = ({ onNavigate }) => {
   const isVotingOpen = electionInfo?.voting?.isOpen;
   const isCandidacyOpen = electionInfo?.candidacies?.isOpen;
   const publishTarget = resultsData?.publishAt || electionInfo?.results?.publishAt;
+
+  // Traitement propre du titre électoral : suppression des "—" cadratins
+  const rawTitle = electionInfo?.title || resultsData?.title || 'Élection des responsables — Communauté No-Code';
+  const sanitizedTitle = rawTitle.replace(/([a-zA-ZÀ-ÿ])—([a-zA-ZÀ-ÿ])/g, '$1-$2');
+  const titleParts = sanitizedTitle.split(/\s*[—–]\s*|\s+-\s+/);
+  const line1 = titleParts[0]?.replace(/[—–]/g, '').trim() || 'Élection des responsables';
+  const line2 = titleParts.slice(1).join(' ').replace(/[—–]/g, '').trim() || (titleParts.length === 1 ? '' : 'Communauté No-Code');
 
   return (
     <main className="flex-1 pb-16">
@@ -87,30 +100,14 @@ export const ResultsPage = ({ onNavigate }) => {
               </div>
             </div>
 
-            {/* Titre principal adapté : 2 lignes sur mobile, 1 ligne sur ordinateur */}
+            {/* Titre principal épuré sans "—" */}
             <div>
-              {(() => {
-                const fullTitle =
-                  electionInfo?.title || resultsData?.title || 'Élection des responsables — Communauté No-Code';
-                const parts = fullTitle.split(/—|-/);
-                if (parts.length >= 2) {
-                  const prefix = parts[0].trim();
-                  const suffix = parts.slice(1).join('—').trim();
-                  return (
-                    <h2 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-content-title tracking-tight leading-snug">
-                      <span className="block md:inline">{prefix} — </span>
-                      <span className="block md:inline text-brand-red md:text-content-title">
-                        {suffix}
-                      </span>
-                    </h2>
-                  );
-                }
-                return (
-                  <h2 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-content-title tracking-tight leading-snug">
-                    {fullTitle}
-                  </h2>
-                );
-              })()}
+              <h2 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-content-title tracking-tight leading-snug">
+                <span className="block">{line1}</span>
+                {line2 && (
+                  <span className="block text-brand-red">{line2}</span>
+                )}
+              </h2>
             </div>
 
             <p className="text-sm text-content-body leading-relaxed">
@@ -214,7 +211,12 @@ export const ResultsPage = ({ onNavigate }) => {
               </h1>
 
               <p className="text-sm sm:text-base text-content-body max-w-2xl mx-auto">
-                {resultsData.electionTitle} — Décompte officiel certifié et inaltérable.
+                <span className="font-semibold text-content-title">
+                  {(resultsData.electionTitle || '').replace(/[—–]/g, ' - ').trim()}
+                </span>
+                <span className="block text-xs sm:text-sm text-content-muted mt-1">
+                  Décompte officiel certifié et inaltérable.
+                </span>
               </p>
             </div>
           </section>

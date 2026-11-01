@@ -9,6 +9,7 @@ import { ResultsPage } from './pages/ResultsPage.jsx';
 import { AdminDashboard } from './pages/admin/AdminDashboard.jsx';
 import { AdminLoginModal } from './components/admin/AdminLoginModal.jsx';
 import { api } from './services/api.js';
+import { useSocketEvent } from './services/socket.js';
 
 function MainApp() {
   const { isAuthenticated } = useAuth();
@@ -24,9 +25,23 @@ function MainApp() {
   const [electionInfo, setElectionInfo] = useState(null);
   const [adminAuthModalOpen, setAdminAuthModalOpen] = useState(false);
 
+  // Fonction universelle de réinitialisation absolue du scroll en haut
+  const scrollToTopMobileStyle = () => {
+    if (typeof window === 'undefined') return;
+    if ('scrollRestoration' in window.history) {
+      window.history.scrollRestoration = 'manual';
+    }
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    if (document.documentElement) document.documentElement.scrollTop = 0;
+    if (document.body) document.body.scrollTop = 0;
+  };
+
   // Initialisation propre de l'état dans l'historique du navigateur
   useEffect(() => {
     if (typeof window !== 'undefined') {
+      if ('scrollRestoration' in window.history) {
+        window.history.scrollRestoration = 'manual';
+      }
       const initial = getPageFromHash();
       if (!window.history.state || window.history.state.page !== initial) {
         window.history.replaceState({ page: initial }, '', `#${initial}`);
@@ -45,13 +60,27 @@ function MainApp() {
       }
     }
     setCurrentPage(page);
+    scrollToTopMobileStyle();
   };
 
-  // Écoute du geste / bouton Retour du téléphone mobile
+  // Écoute du geste / bouton Retour du téléphone mobile avec retour immédiat tout en haut
   useEffect(() => {
     const handlePopState = (e) => {
       const targetPage = e.state?.page || getPageFromHash();
       setCurrentPage(targetPage);
+
+      // Force le scroll tout en haut immédiatement pour contrer la restauration auto du navigateur
+      scrollToTopMobileStyle();
+      requestAnimationFrame(scrollToTopMobileStyle);
+      const t1 = setTimeout(scrollToTopMobileStyle, 20);
+      const t2 = setTimeout(scrollToTopMobileStyle, 80);
+      const t3 = setTimeout(scrollToTopMobileStyle, 160);
+
+      return () => {
+        clearTimeout(t1);
+        clearTimeout(t2);
+        clearTimeout(t3);
+      };
     };
 
     window.addEventListener('popstate', handlePopState);
@@ -71,31 +100,16 @@ function MainApp() {
     fetchElectionInfo();
   }, [currentPage]);
 
-  // Réinitialisation instantanée et absolue du scroll en haut comme une application mobile native
+  // Synchronisation temps réel WebSocket pour les paramètres globaux et le scrutin
+  useSocketEvent('ELECTION_UPDATED', fetchElectionInfo);
+  useSocketEvent('ELECTION_RESET', fetchElectionInfo);
+
+  // Réinitialisation instantanée et absolue du scroll en haut à chaque changement de page
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      if ('scrollRestoration' in window.history) {
-        window.history.scrollRestoration = 'manual';
-      }
-      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
-      if (document.documentElement) document.documentElement.scrollTop = 0;
-      if (document.body) document.body.scrollTop = 0;
-
-      // Garantir le repositionnement en haut même après le layout et rendu React
-      requestAnimationFrame(() => {
-        window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
-        if (document.documentElement) document.documentElement.scrollTop = 0;
-        if (document.body) document.body.scrollTop = 0;
-      });
-
-      const timer = setTimeout(() => {
-        window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
-        if (document.documentElement) document.documentElement.scrollTop = 0;
-        if (document.body) document.body.scrollTop = 0;
-      }, 50);
-
-      return () => clearTimeout(timer);
-    }
+    scrollToTopMobileStyle();
+    requestAnimationFrame(scrollToTopMobileStyle);
+    const timer = setTimeout(scrollToTopMobileStyle, 50);
+    return () => clearTimeout(timer);
   }, [currentPage]);
 
   // Si la vue demandée est l'administration

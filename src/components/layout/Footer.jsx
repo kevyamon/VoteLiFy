@@ -61,7 +61,7 @@ export const Footer = ({ onOpenAdminAuth }) => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-2 select-none">
         {/* Texte informatif protégé contre toute sélection parasite */}
         <p className="font-medium text-content-body select-none pointer-events-none">
-          Plateforme numérique d'organisation électorale et de proclamation certifiée.
+          VoteLiFy — Plateforme numérique officielle de vote électronique sécurisé et de dépouillement certifié.
         </p>
 
         {/* Déclencheur discret sur le copyright avec zone de contact généreuse */}

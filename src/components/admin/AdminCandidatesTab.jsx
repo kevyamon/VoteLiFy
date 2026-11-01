@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../../services/api.js';
+import { useSocketEvent } from '../../services/socket.js';
 import { Button } from '../common/Button.jsx';
 import { Badge } from '../common/Badge.jsx';
 import { CustomSelect } from '../common/CustomSelect.jsx';
@@ -67,6 +68,11 @@ export const AdminCandidatesTab = () => {
   useEffect(() => {
     loadData();
   }, [statusFilter, positionFilter]);
+
+  // Synchronisation temps réel des candidatures pour la Commission Électorale
+  useSocketEvent('CANDIDATE_CREATED', loadData);
+  useSocketEvent('CANDIDATE_UPDATED', loadData);
+  useSocketEvent('POSITIONS_UPDATED', loadData);
 
   const handleApprove = async (id, name) => {
     try {

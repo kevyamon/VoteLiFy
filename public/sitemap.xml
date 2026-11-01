@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
+        http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+  
+  <!-- Page d'accueil officielle du scrutin VoteLiFy -->
+  <url>
+    <loc>https://votelify.vercel.app/</loc>
+    <lastmod>2026-11-01</lastmod>
+    <changefreq>hourly</changefreq>
+    <priority>1.0</priority>
+  </url>
+
+  <!-- Page publique des résultats officiels certifiés -->
+  <url>
+    <loc>https://votelify.vercel.app/#results</loc>
+    <lastmod>2026-11-01</lastmod>
+    <changefreq>hourly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- Portail officiel de dépôt des candidatures -->
+  <url>
+    <loc>https://votelify.vercel.app/#apply</loc>
+    <lastmod>2026-11-01</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+</urlset>

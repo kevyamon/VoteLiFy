@@ -1,0 +1,12 @@
+# Robots.txt officiel pour VoteLiFy
+# Directive d'indexation pour les moteurs de recherche (Google, Bing, etc.)
+
+User-agent: *
+Allow: /
+Allow: /#apply
+Allow: /#results
+Disallow: /api/
+Disallow: /#admin
+
+# Indication de l'emplacement du sitemap XML
+Sitemap: https://votelify.vercel.app/sitemap.xml

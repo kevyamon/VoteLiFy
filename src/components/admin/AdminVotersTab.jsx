@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../../services/api.js';
+import { useSocketEvent } from '../../services/socket.js';
 import { Button } from '../common/Button.jsx';
 import { Badge } from '../common/Badge.jsx';
 import { CustomSelect } from '../common/CustomSelect.jsx';
@@ -50,6 +51,11 @@ export const AdminVotersTab = () => {
   useEffect(() => {
     loadVoters(1);
   }, [filterVoted]);
+
+  // Synchronisation temps réel du registre d'émargement
+  useSocketEvent('VOTE_CAST', () => loadVoters(pagination.page));
+  useSocketEvent('VOTERS_IMPORTED', () => loadVoters(1));
+  useSocketEvent('ELECTION_RESET', () => loadVoters(1));
 
   const handlePreview = async () => {
     if (!rawText.trim()) {

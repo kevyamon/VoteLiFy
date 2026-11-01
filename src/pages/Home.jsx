@@ -5,6 +5,7 @@ import { VoteModal } from '../components/vote/VoteModal.jsx';
 import { CountdownTimer } from '../components/common/CountdownTimer.jsx';
 import { Button } from '../components/common/Button.jsx';
 import { HomeSkeleton } from '../components/common/Skeleton.jsx';
+import { useSocketEvent } from '../services/socket.js';
 import { UserPlus, RefreshCw, Users } from 'lucide-react';
 
 export const Home = ({ onNavigate }) => {
@@ -38,6 +39,12 @@ export const Home = ({ onNavigate }) => {
     fetchData();
   }, []);
 
+  // Synchronisation temps réel automatique
+  useSocketEvent('ELECTION_UPDATED', fetchData);
+  useSocketEvent('CANDIDATE_UPDATED', fetchData);
+  useSocketEvent('POSITIONS_UPDATED', fetchData);
+  useSocketEvent('ELECTION_RESET', fetchData);
+
   const handleVoteClick = (candidate, positionName) => {
     setSelectedCandidate(candidate);
     setSelectedPositionName(positionName);
@@ -68,32 +75,24 @@ export const Home = ({ onNavigate }) => {
     return <HomeSkeleton />;
   }
 
+  // Traitement propre du titre électoral : suppression des "—" cadratins
+  const rawTitle = electionInfo?.title || 'Élection des responsables — Communauté No-Code';
+  const sanitizedTitle = rawTitle.replace(/([a-zA-ZÀ-ÿ])—([a-zA-ZÀ-ÿ])/g, '$1-$2');
+  const titleParts = sanitizedTitle.split(/\s*[—–]\s*|\s+-\s+/);
+  const line1 = titleParts[0]?.replace(/[—–]/g, '').trim() || 'Élection des responsables';
+  const line2 = titleParts.slice(1).join(' ').replace(/[—–]/g, '').trim() || (titleParts.length === 1 ? '' : 'Communauté No-Code');
+
   return (
     <main className="flex-1 pb-16">
       {/* 1. Bannière de présentation officielle du scrutin (CDC Section 5.2) */}
       <section className="bg-gradient-to-b from-surface-subtle to-surface-base border-b border-surface-border py-12 md:py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6">
-          {(() => {
-            const fullTitle = electionInfo?.title || 'Élection des responsables — Communauté No-Code';
-            const parts = fullTitle.split(/—|-/);
-            if (parts.length >= 2) {
-              const prefix = parts[0].trim();
-              const suffix = parts.slice(1).join('—').trim();
-              return (
-                <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold text-content-title tracking-tight max-w-4xl mx-auto leading-tight">
-                  <span className="block md:inline">{prefix} — </span>
-                  <span className="block md:inline text-brand-red md:text-content-title">
-                    {suffix}
-                  </span>
-                </h1>
-              );
-            }
-            return (
-              <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold text-content-title tracking-tight max-w-4xl mx-auto leading-tight">
-                {fullTitle}
-              </h1>
-            );
-          })()}
+          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold text-content-title tracking-tight max-w-4xl mx-auto leading-tight">
+            <span className="block">{line1}</span>
+            {line2 && (
+              <span className="block text-brand-red">{line2}</span>
+            )}
+          </h1>
 
           <p className="text-base sm:text-lg text-content-body max-w-2xl mx-auto leading-relaxed">
             {electionInfo?.description ||

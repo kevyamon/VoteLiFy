@@ -1,7 +1,7 @@
 {
   "short_name": "VoteLiFy",
-  "name": "VoteLiFy (VLF) — Plateforme Électorale Sécurisée",
-  "description": "Plateforme numérique officielle de vote sécurisé et de proclamation certifiée.",
+  "name": "VoteLiFy — Plateforme Officielle de Vote Sécurisé",
+  "description": "VoteLiFy est la plateforme numérique officielle de vote électronique sécurisé par code PIN secret, de modération des candidatures et de dépouillement certifié.",
   "icons": [
     {
       "src": "/logo.png",
@@ -17,9 +17,27 @@
     }
   ],
   "start_url": "/",
+  "scope": "/",
   "background_color": "#ffffff",
   "theme_color": "#f20411",
   "display": "standalone",
   "orientation": "portrait-primary",
-  "lang": "fr-FR"
+  "lang": "fr-FR",
+  "categories": ["utilities", "productivity", "government"],
+  "shortcuts": [
+    {
+      "name": "Consulter les résultats",
+      "short_name": "Résultats",
+      "description": "Accéder aux résultats certifiés du scrutin",
+      "url": "/#results",
+      "icons": [{ "src": "/logo.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Déposer sa candidature",
+      "short_name": "Candidater",
+      "description": "Soumettre sa candidature officielle",
+      "url": "/#apply",
+      "icons": [{ "src": "/logo.png", "sizes": "192x192" }]
+    }
+  ]
 }

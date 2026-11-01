@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../../services/api.js';
+import { useSocketEvent } from '../../services/socket.js';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { useToast } from '../../context/ToastContext.jsx';
 import { Button } from '../../components/common/Button.jsx';
@@ -44,6 +45,14 @@ export const AdminDashboard = ({ onNavigate }) => {
   useEffect(() => {
     loadStats();
   }, [activeTab]);
+
+  // Synchronisation temps réel pour le tableau de bord
+  useSocketEvent('VOTE_CAST', loadStats);
+  useSocketEvent('CANDIDATE_CREATED', loadStats);
+  useSocketEvent('CANDIDATE_UPDATED', loadStats);
+  useSocketEvent('ELECTION_UPDATED', loadStats);
+  useSocketEvent('ELECTION_RESET', loadStats);
+  useSocketEvent('VOTERS_IMPORTED', loadStats);
 
   const handleLogout = async () => {
     try {
