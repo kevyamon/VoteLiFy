@@ -49,12 +49,42 @@
   }
 }
 
+@keyframes heroTitleEntry {
+  0% {
+    opacity: 0;
+    transform: translateY(22px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes statCardEntry {
+  0% {
+    opacity: 0;
+    transform: translateY(16px) scale(0.96);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
 .animate-fade-in {
   animation: fadeIn 0.2s ease-out forwards;
 }
 
 .animate-scale-up {
   animation: scaleUp 0.2s ease-out forwards;
+}
+
+.animate-hero-title {
+  animation: heroTitleEntry 0.75s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.animate-stat-card {
+  animation: statCardEntry 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 /* Masquage de la barre de défilement pour les carrousels mobiles */

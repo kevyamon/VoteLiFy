@@ -180,8 +180,18 @@ function MainApp() {
           currentElection={selectedElection}
         />
       )}
-      {currentPage === 'apply' && <ApplyCandidate onNavigate={navigateTo} />}
-      {currentPage === 'results' && <ResultsPage onNavigate={navigateTo} />}
+      {currentPage === 'apply' && (
+        <ApplyCandidate
+          onNavigate={navigateTo}
+          currentElection={selectedElection}
+        />
+      )}
+      {currentPage === 'results' && (
+        <ResultsPage
+          onNavigate={navigateTo}
+          currentElection={selectedElection}
+        />
+      )}
 
 
       {/* Pied de page officiel avec déclencheur 10 secondes */}

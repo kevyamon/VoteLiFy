@@ -36,14 +36,8 @@ export const LandingPage = ({ onNavigate }) => {
         </div>
 
         <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-8">
-          {/* Badge officiel de confiance */}
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-brand-red-light text-brand-red text-xs font-bold border border-brand-red/20 shadow-xs">
-            <ShieldCheck className="w-4 h-4" />
-            <span>Plateforme Électorale Certifiée & Impartiale</span>
-          </div>
-
-          {/* Titre d'accroche institutionnel */}
-          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-content-title tracking-tight leading-tight max-w-4xl mx-auto">
+          {/* Titre d'accroche institutionnel avec animation à l'ouverture et au rechargement */}
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-content-title tracking-tight leading-tight max-w-4xl mx-auto animate-hero-title">
             La démocratie communautaire{' '}
             <span className="block text-brand-red mt-1 sm:mt-2">
               simple, secrète et infalsifiable
@@ -57,46 +51,72 @@ export const LandingPage = ({ onNavigate }) => {
             d’un code PIN individuel secret, et chaque suffrage est certifié en toute impartialité.
           </p>
 
-          {/* Boutons d'action principaux */}
+          {/* Boutons d'action principaux au design haut de gamme */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
-            <Button
-              variant="primary"
-              size="lg"
-              icon={<Vote className="w-5 h-5" />}
+            <button
               onClick={() => onNavigate('elections')}
-              className="w-full sm:w-auto shadow-md hover:shadow-lg"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-7 py-3.5 rounded-2xl bg-gradient-to-r from-red-600 via-brand-red to-rose-600 text-white font-extrabold text-sm sm:text-base shadow-lg shadow-brand-red/30 hover:shadow-xl hover:shadow-brand-red/40 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 border border-white/20 focus:outline-none focus:ring-2 focus:ring-brand-red/50 cursor-pointer"
             >
+              <Vote className="w-5 h-5 flex-shrink-0" />
               <span>Voir les élections disponibles</span>
-              <ArrowRight className="w-4 h-4 ml-1" />
-            </Button>
+              <ArrowRight className="w-4 h-4 ml-1 flex-shrink-0 transition-transform group-hover:translate-x-1" />
+            </button>
 
             <Button
               variant="outline"
               size="lg"
               onClick={scrollToFeatures}
-              className="w-full sm:w-auto"
+              className="w-full sm:w-auto rounded-2xl font-bold border-2 hover:bg-surface-subtle"
             >
               Comment ça fonctionne ?
             </Button>
           </div>
 
-          {/* Indicateurs clés de confiance */}
+          {/* Indicateurs clés de confiance avec police de l'accroche et animation soignée */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-8 border-t border-surface-border text-center">
-            <div className="p-3 bg-surface-pure rounded-xl border border-surface-border shadow-xs">
-              <span className="block text-xl font-extrabold text-content-title font-mono">100 %</span>
-              <span className="text-[11px] text-content-muted font-medium">Suffrage Anonyme</span>
+            <div
+              className="p-4 bg-surface-pure rounded-2xl border border-surface-border shadow-soft hover:shadow-md transition-all animate-stat-card"
+              style={{ animationDelay: '100ms' }}
+            >
+              <span className="block text-2xl sm:text-3xl font-black text-content-title font-sans tracking-tight">
+                100 %
+              </span>
+              <span className="text-xs text-content-muted font-bold mt-1.5 block">
+                Suffrage Anonyme
+              </span>
             </div>
-            <div className="p-3 bg-surface-pure rounded-xl border border-surface-border shadow-xs">
-              <span className="block text-xl font-extrabold text-brand-blue font-mono">1 PIN = 1 Voix</span>
-              <span className="text-[11px] text-content-muted font-medium">Sécurité Unique</span>
+            <div
+              className="p-4 bg-surface-pure rounded-2xl border border-surface-border shadow-soft hover:shadow-md transition-all animate-stat-card"
+              style={{ animationDelay: '200ms' }}
+            >
+              <span className="block text-2xl sm:text-3xl font-black text-brand-blue font-sans tracking-tight">
+                1 PIN = 1 Voix
+              </span>
+              <span className="text-xs text-content-muted font-bold mt-1.5 block">
+                Sécurité Unique
+              </span>
             </div>
-            <div className="p-3 bg-surface-pure rounded-xl border border-surface-border shadow-xs">
-              <span className="block text-xl font-extrabold text-emerald-600 font-mono">Temps Réel</span>
-              <span className="text-[11px] text-content-muted font-medium">Dépouillement Certifié</span>
+            <div
+              className="p-4 bg-surface-pure rounded-2xl border border-surface-border shadow-soft hover:shadow-md transition-all animate-stat-card"
+              style={{ animationDelay: '300ms' }}
+            >
+              <span className="block text-2xl sm:text-3xl font-black text-emerald-600 font-sans tracking-tight">
+                Temps Réel
+              </span>
+              <span className="text-xs text-content-muted font-bold mt-1.5 block">
+                Dépouillement Certifié
+              </span>
             </div>
-            <div className="p-3 bg-surface-pure rounded-xl border border-surface-border shadow-xs">
-              <span className="block text-xl font-extrabold text-brand-red font-mono">0 Tricherie</span>
-              <span className="text-[11px] text-content-muted font-medium">Intégrité Totale</span>
+            <div
+              className="p-4 bg-surface-pure rounded-2xl border border-surface-border shadow-soft hover:shadow-md transition-all animate-stat-card"
+              style={{ animationDelay: '400ms' }}
+            >
+              <span className="block text-2xl sm:text-3xl font-black text-brand-red font-sans tracking-tight">
+                0 Tricherie
+              </span>
+              <span className="text-xs text-content-muted font-bold mt-1.5 block">
+                Intégrité Totale
+              </span>
             </div>
           </div>
         </div>
@@ -297,17 +317,15 @@ export const LandingPage = ({ onNavigate }) => {
           <p className="text-sm sm:text-base text-slate-300 max-w-2xl mx-auto leading-relaxed">
             Accédez sans attendre aux scrutins ouverts, découvrez les candidats pour chaque poste électoral et déposez votre vote.
           </p>
-          <div className="pt-2">
-            <Button
-              variant="primary"
-              size="lg"
-              icon={<Vote className="w-5 h-5" />}
+          <div className="pt-3">
+            <button
               onClick={() => onNavigate('elections')}
-              className="shadow-glow"
+              className="inline-flex items-center justify-center gap-3 px-8 py-4 rounded-2xl bg-gradient-to-r from-brand-red via-red-600 to-rose-600 text-white font-extrabold text-base shadow-xl shadow-brand-red/35 hover:shadow-2xl hover:shadow-brand-red/50 hover:scale-[1.03] active:scale-[0.98] transition-all duration-300 border border-white/20 focus:outline-none focus:ring-2 focus:ring-brand-red/50 cursor-pointer group"
             >
+              <Vote className="w-5 h-5 flex-shrink-0" />
               <span>Accéder aux élections</span>
-              <ChevronRight className="w-4 h-4 ml-1" />
-            </Button>
+              <ChevronRight className="w-5 h-5 flex-shrink-0 transition-transform group-hover:translate-x-1" />
+            </button>
           </div>
         </div>
       </section>

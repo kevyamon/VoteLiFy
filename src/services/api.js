@@ -58,13 +58,21 @@ export const api = {
   getElections: () => request('/elections'),
   getElectionById: (id) => request(`/elections/${id}`),
   getElectionInfo: () => request('/election'),
-  getPositions: () => request('/positions'),
-  getCandidates: () => request('/candidates'),
+  getPositions: (params = {}) => {
+    const query = new URLSearchParams(params).toString();
+    return request(`/positions${query ? `?${query}` : ''}`);
+  },
+  getCandidates: (params = {}) => {
+    const query = new URLSearchParams(params).toString();
+    return request(`/candidates${query ? `?${query}` : ''}`);
+  },
   getCandidateById: (id) => request(`/candidates/${id}`),
   submitCandidacy: (data) => request('/candidates', { method: 'POST', body: data }),
   submitVote: (data) => request('/votes/submit', { method: 'POST', body: data }),
-  getResults: () => request('/results'),
-
+  getResults: (params = {}) => {
+    const query = new URLSearchParams(params).toString();
+    return request(`/results${query ? `?${query}` : ''}`);
+  },
 
   // Authentification administrative
   registerAdmin: async (data) => {
@@ -93,23 +101,40 @@ export const api = {
   getMe: () => request('/admin/me'),
 
   // Dashboard et Contrôle du scrutin
-  getDashboardStats: () => request('/admin/dashboard'),
+  getDashboardStats: (params = {}) => {
+    const query = new URLSearchParams(params).toString();
+    return request(`/admin/dashboard${query ? `?${query}` : ''}`);
+  },
   getAllElectionsAdmin: () => request('/admin/elections'),
   createElectionAdmin: (data) => request('/admin/elections', { method: 'POST', body: data }),
   updateElectionAdmin: (id, data) => request(`/admin/elections/${id}`, { method: 'PATCH', body: data }),
+  deleteElectionAdmin: (id) => request(`/admin/elections/${id}`, { method: 'DELETE' }),
+  openElectionVotingAdmin: (id) => request(`/admin/elections/${id}/open-voting`, { method: 'POST' }),
+  closeElectionVotingAdmin: (id) => request(`/admin/elections/${id}/close-voting`, { method: 'POST' }),
+  openElectionCandidaciesAdmin: (id) => request(`/admin/elections/${id}/open-candidates`, { method: 'POST' }),
+  closeElectionCandidaciesAdmin: (id) => request(`/admin/elections/${id}/close-candidates`, { method: 'POST' }),
+  publishElectionResultsAdmin: (id) => request(`/admin/elections/${id}/publish-results`, { method: 'POST' }),
+  unpublishElectionResultsAdmin: (id) => request(`/admin/elections/${id}/unpublish-results`, { method: 'POST' }),
+  uploadElectionImageAdmin: (id, image) => request(`/admin/elections/${id}/upload-image`, { method: 'POST', body: { image } }),
+
   updateSettings: (data) => request('/admin/election/settings', { method: 'PATCH', body: data }),
   openVoting: () => request('/admin/election/open-voting', { method: 'POST' }),
-
   closeVoting: () => request('/admin/election/close-voting', { method: 'POST' }),
   openCandidacies: () => request('/admin/election/open-candidates', { method: 'POST' }),
   closeCandidacies: () => request('/admin/election/close-candidates', { method: 'POST' }),
   publishResults: () => request('/admin/election/publish-results', { method: 'POST' }),
   unpublishResults: () => request('/admin/election/unpublish-results', { method: 'POST' }),
-  getTally: () => request('/admin/election/tally'),
+  getTally: (params = {}) => {
+    const query = new URLSearchParams(params).toString();
+    return request(`/admin/election/tally${query ? `?${query}` : ''}`);
+  },
   resetTestData: (data) => request('/admin/election/reset', { method: 'POST', body: data }),
 
   // Gestion des postes
-  getAllPositionsAdmin: () => request('/admin/positions'),
+  getAllPositionsAdmin: (params = {}) => {
+    const query = new URLSearchParams(params).toString();
+    return request(`/admin/positions${query ? `?${query}` : ''}`);
+  },
   createPosition: (data) => request('/admin/positions', { method: 'POST', body: data }),
   updatePosition: (id, data) => request(`/admin/positions/${id}`, { method: 'PATCH', body: data }),
   deletePosition: (id) => request(`/admin/positions/${id}`, { method: 'DELETE' }),
@@ -121,7 +146,10 @@ export const api = {
     const query = new URLSearchParams(params).toString();
     return request(`/admin/voters${query ? `?${query}` : ''}`);
   },
-  exportVoters: () => request('/admin/voters/export'),
+  exportVoters: (params = {}) => {
+    const query = new URLSearchParams(params).toString();
+    return request(`/admin/voters/export${query ? `?${query}` : ''}`);
+  },
   deleteVoter: (id) => request(`/admin/voters/${id}`, { method: 'DELETE' }),
   regenerateVoterPin: (id) => request(`/admin/voters/${id}/regenerate-pin`, { method: 'POST' }),
 

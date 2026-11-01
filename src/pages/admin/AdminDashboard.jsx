@@ -30,14 +30,30 @@ export const AdminDashboard = ({ onNavigate }) => {
   const [activeTab, setActiveTab] = useState('overview');
   const [stats, setStats] = useState(null);
   const [isLoadingStats, setIsLoadingStats] = useState(true);
+  const [electionsList, setElectionsList] = useState([]);
+  const [selectedElectionId, setSelectedElectionId] = useState('');
 
   const { admin, logout } = useAuth();
   const toast = useToast();
 
+  const loadElectionsList = async () => {
+    try {
+      const data = await api.getAllElectionsAdmin();
+      setElectionsList(data || []);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  useEffect(() => {
+    loadElectionsList();
+  }, []);
+
   const loadStats = async () => {
     setIsLoadingStats(true);
     try {
-      const data = await api.getDashboardStats();
+      const params = selectedElectionId ? { electionId: selectedElectionId } : {};
+      const data = await api.getDashboardStats(params);
       setStats(data);
     } catch (err) {
       toast.error('Erreur lors de la récupération des statistiques globales.');
@@ -48,13 +64,18 @@ export const AdminDashboard = ({ onNavigate }) => {
 
   useEffect(() => {
     loadStats();
-  }, [activeTab]);
+  }, [activeTab, selectedElectionId]);
 
   // Synchronisation temps réel pour le tableau de bord
   useSocketEvent('VOTE_CAST', loadStats);
   useSocketEvent('CANDIDATE_CREATED', loadStats);
   useSocketEvent('CANDIDATE_UPDATED', loadStats);
-  useSocketEvent('ELECTION_UPDATED', loadStats);
+  useSocketEvent('ELECTION_UPDATED', () => {
+    loadStats();
+    loadElectionsList();
+  });
+  useSocketEvent('ELECTION_CREATED', loadElectionsList);
+  useSocketEvent('ELECTION_DELETED', loadElectionsList);
   useSocketEvent('ELECTION_RESET', loadStats);
   useSocketEvent('VOTERS_IMPORTED', loadStats);
 
@@ -146,6 +167,28 @@ export const AdminDashboard = ({ onNavigate }) => {
           })}
         </div>
 
+        {/* Filtre par scrutin actif */}
+        {activeTab !== 'elections' && electionsList.length > 0 && (
+          <div className="bg-surface-pure rounded-2xl border border-surface-border p-3 sm:p-4 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="flex items-center gap-2">
+              <Vote className="w-4 h-4 text-brand-red flex-shrink-0" />
+              <span className="text-xs font-bold text-content-title">Filtrer par scrutin :</span>
+            </div>
+            <select
+              value={selectedElectionId}
+              onChange={(e) => setSelectedElectionId(e.target.value)}
+              className="p-2 bg-surface-base border border-surface-border rounded-xl text-xs font-semibold text-content-title focus:border-brand-red focus:outline-none min-w-[240px]"
+            >
+              <option value="">Tous les scrutins confondus</option>
+              {electionsList.map((el) => (
+                <option key={el._id} value={el._id}>
+                  {el.title}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+
         {/* 1. Onglet Vue d'ensemble (CDC Section 5.3) */}
         {activeTab === 'overview' && (
           <div className="space-y-6 animate-fade-in">
@@ -222,13 +265,13 @@ export const AdminDashboard = ({ onNavigate }) => {
         {activeTab === 'elections' && <AdminElectionsTab />}
 
         {/* 3. Onglet Électeurs & PINs */}
-        {activeTab === 'voters' && <AdminVotersTab />}
+        {activeTab === 'voters' && <AdminVotersTab electionId={selectedElectionId} />}
 
         {/* 4. Onglet Candidatures */}
-        {activeTab === 'candidates' && <AdminCandidatesTab />}
+        {activeTab === 'candidates' && <AdminCandidatesTab electionId={selectedElectionId} />}
 
         {/* 5. Onglet Dépouillement */}
-        {activeTab === 'tally' && <AdminTallyTab />}
+        {activeTab === 'tally' && <AdminTallyTab electionId={selectedElectionId} />}
 
         {/* 6. Onglet Paramètres du Scrutin */}
         {activeTab === 'settings' && <AdminSettingsTab />}

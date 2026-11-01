@@ -20,9 +20,10 @@ export const Home = ({ onNavigate, currentElection }) => {
   const fetchData = async () => {
     setIsLoading(true);
     try {
+      const electionId = currentElection?._id;
       const [info, candidates] = await Promise.all([
-        api.getElectionInfo(),
-        api.getCandidates(),
+        electionId ? api.getElectionById(electionId) : api.getElectionInfo(),
+        api.getCandidates(electionId ? { electionId } : {}),
       ]);
       setElectionInfo(info);
       setGroupedCandidates(candidates || []);
@@ -38,7 +39,7 @@ export const Home = ({ onNavigate, currentElection }) => {
     if (document.documentElement) document.documentElement.scrollTop = 0;
     if (document.body) document.body.scrollTop = 0;
     fetchData();
-  }, []);
+  }, [currentElection?._id]);
 
   // Synchronisation temps réel automatique
   useSocketEvent('ELECTION_UPDATED', fetchData);
@@ -77,12 +78,13 @@ export const Home = ({ onNavigate, currentElection }) => {
   }
 
   // Traitement propre du titre électoral : suppression des "—" cadratins
-  const rawTitle = currentElection?.title || electionInfo?.title || 'Élection des responsables — Communauté No-Code';
+  const rawTitle = currentElection?.title || electionInfo?.title || 'Élection officielle';
   const sanitizedTitle = rawTitle.replace(/([a-zA-ZÀ-ÿ])—([a-zA-ZÀ-ÿ])/g, '$1-$2');
   const titleParts = sanitizedTitle.split(/\s*[—–]\s*|\s+-\s+/);
-  const line1 = titleParts[0]?.replace(/[—–]/g, '').trim() || 'Élection des responsables';
-  const line2 = titleParts.slice(1).join(' ').replace(/[—–]/g, '').trim() || (titleParts.length === 1 ? '' : 'Communauté No-Code');
-  const initials = currentElection?.initials || (rawTitle.replace(/[^a-zA-ZÀ-ÿ0-9]/g, '').slice(0, 2).toUpperCase() || 'EL');
+  const line1 = titleParts[0]?.replace(/[—–]/g, '').trim() || 'Élection officielle';
+  const line2 = titleParts.slice(1).join(' ').replace(/[—–]/g, '').trim() || '';
+  const initials = currentElection?.initials || electionInfo?.initials || (rawTitle.replace(/[^a-zA-ZÀ-ÿ0-9]/g, '').slice(0, 2).toUpperCase() || 'EL');
+  const electionImageUrl = currentElection?.imageUrl || electionInfo?.imageUrl;
 
   return (
     <main className="flex-1 pb-16">
@@ -100,10 +102,18 @@ export const Home = ({ onNavigate, currentElection }) => {
             </button>
           </div>
 
-          {/* Monogramme élégant de l'élection */}
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-brand-red via-brand-red to-brand-blue text-white flex items-center justify-center font-black text-2xl tracking-wider shadow-md mx-auto border-2 border-white">
-            <span>{initials}</span>
-          </div>
+          {/* Illustration ou Monogramme élégant de l'élection */}
+          {electionImageUrl ? (
+            <img
+              src={electionImageUrl}
+              alt={rawTitle}
+              className="w-20 h-20 rounded-2xl object-cover shadow-md mx-auto border-2 border-white"
+            />
+          ) : (
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-brand-red via-brand-red to-brand-blue text-white flex items-center justify-center font-black text-2xl tracking-wider shadow-md mx-auto border-2 border-white">
+              <span>{initials}</span>
+            </div>
+          )}
 
           <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold text-content-title tracking-tight max-w-4xl mx-auto leading-tight">
             <span className="block">{line1}</span>
@@ -234,12 +244,12 @@ export const Home = ({ onNavigate, currentElection }) => {
 
       {/* 4. Modale de vote sécurisé par PIN */}
       <VoteModal
-
         isOpen={voteModalOpen}
         onClose={() => setVoteModalOpen(false)}
         candidate={selectedCandidate}
         positionName={selectedPositionName}
         onVoteSuccess={handleVoteSuccess}
+        electionId={currentElection?._id || electionInfo?._id}
       />
     </main>
   );

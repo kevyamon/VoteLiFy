@@ -17,7 +17,7 @@ import {
   Briefcase,
 } from 'lucide-react';
 
-export const ApplyCandidate = ({ onNavigate }) => {
+export const ApplyCandidate = ({ onNavigate, currentElection }) => {
   const [positions, setPositions] = useState([]);
   const [electionInfo, setElectionInfo] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -43,9 +43,10 @@ export const ApplyCandidate = ({ onNavigate }) => {
 
     const fetchPrerequisites = async () => {
       try {
+        const electionId = currentElection?._id;
         const [info, posList] = await Promise.all([
-          api.getElectionInfo(),
-          api.getPositions(),
+          electionId ? api.getElectionById(electionId) : api.getElectionInfo(),
+          api.getPositions(electionId ? { electionId } : {}),
         ]);
         setElectionInfo(info);
         setPositions(posList || []);
@@ -60,7 +61,7 @@ export const ApplyCandidate = ({ onNavigate }) => {
     };
 
     fetchPrerequisites();
-  }, []);
+  }, [currentElection?._id]);
 
   // Conversion de la photo locale en Data URL pour téléversement autonome
   const handlePhotoUpload = (e) => {
@@ -104,6 +105,7 @@ export const ApplyCandidate = ({ onNavigate }) => {
         photoUrl,
         pitch: pitch.trim(),
         videoUrl: videoUrl.trim(),
+        electionId: currentElection?._id || electionInfo?._id,
       });
 
       setSubmittedSuccess(true);
@@ -115,7 +117,7 @@ export const ApplyCandidate = ({ onNavigate }) => {
     }
   };
 
-  const isCandidacyOpen = electionInfo?.candidacies?.isOpen;
+  const isCandidacyOpen = currentElection?.candidacies?.isOpen ?? electionInfo?.candidacies?.isOpen;
 
   if (isLoading) {
     return <ApplySkeleton />;
@@ -136,7 +138,7 @@ export const ApplyCandidate = ({ onNavigate }) => {
             Dépôt des candidatures clos
           </h1>
           <p className="text-sm text-content-body max-w-md mx-auto leading-relaxed">
-            La période officielle de dépôt des candidatures pour l'élection de la FORMATION NO-CODE est terminée. Aucun nouveau dossier ne peut être soumis.
+            La période officielle de dépôt des candidatures pour le scrutin « {currentElection?.title || electionInfo?.title || 'sélectionné'} » est terminée. Aucun nouveau dossier ne peut être soumis.
           </p>
         </div>
         <div className="pt-4">

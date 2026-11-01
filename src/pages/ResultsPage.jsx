@@ -17,7 +17,7 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 
-export const ResultsPage = ({ onNavigate }) => {
+export const ResultsPage = ({ onNavigate, currentElection }) => {
   const [resultsData, setResultsData] = useState(null);
   const [electionInfo, setElectionInfo] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -25,9 +25,10 @@ export const ResultsPage = ({ onNavigate }) => {
   const fetchResults = async () => {
     setIsLoading(true);
     try {
+      const electionId = currentElection?._id;
       const [resData, info] = await Promise.all([
-        api.getResults(),
-        api.getElectionInfo(),
+        api.getResults(electionId ? { electionId } : {}),
+        electionId ? api.getElectionById(electionId) : api.getElectionInfo(),
       ]);
       setResultsData(resData);
       setElectionInfo(info);
@@ -43,7 +44,7 @@ export const ResultsPage = ({ onNavigate }) => {
     if (document.documentElement) document.documentElement.scrollTop = 0;
     if (document.body) document.body.scrollTop = 0;
     fetchResults();
-  }, []);
+  }, [currentElection?._id]);
 
   // Synchronisation temps réel automatique
   useSocketEvent('ELECTION_UPDATED', fetchResults);
@@ -60,11 +61,11 @@ export const ResultsPage = ({ onNavigate }) => {
   const publishTarget = resultsData?.publishAt || electionInfo?.results?.publishAt;
 
   // Traitement propre du titre électoral : suppression des "—" cadratins
-  const rawTitle = electionInfo?.title || resultsData?.title || 'Élection des responsables — Communauté No-Code';
+  const rawTitle = currentElection?.title || electionInfo?.title || resultsData?.title || 'Élection officielle';
   const sanitizedTitle = rawTitle.replace(/([a-zA-ZÀ-ÿ])—([a-zA-ZÀ-ÿ])/g, '$1-$2');
   const titleParts = sanitizedTitle.split(/\s*[—–]\s*|\s+-\s+/);
-  const line1 = titleParts[0]?.replace(/[—–]/g, '').trim() || 'Élection des responsables';
-  const line2 = titleParts.slice(1).join(' ').replace(/[—–]/g, '').trim() || (titleParts.length === 1 ? '' : 'Communauté No-Code');
+  const line1 = titleParts[0]?.replace(/[—–]/g, '').trim() || 'Élection officielle';
+  const line2 = titleParts.slice(1).join(' ').replace(/[—–]/g, '').trim() || '';
 
   return (
     <main className="flex-1 pb-16">

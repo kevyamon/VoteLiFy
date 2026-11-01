@@ -5,7 +5,7 @@ import { Button } from '../common/Button.jsx';
 import { useToast } from '../../context/ToastContext.jsx';
 import { BarChart3, RefreshCw, Users, CheckCircle2, Award } from 'lucide-react';
 
-export const AdminTallyTab = () => {
+export const AdminTallyTab = ({ electionId }) => {
   const [tallyData, setTallyData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -14,7 +14,7 @@ export const AdminTallyTab = () => {
   const loadTally = async () => {
     setIsLoading(true);
     try {
-      const data = await api.getTally();
+      const data = await api.getTally(electionId ? { electionId } : {});
       setTallyData(data);
     } catch (err) {
       toast.error('Impossible de récupérer le dépouillement en direct.');
@@ -25,7 +25,7 @@ export const AdminTallyTab = () => {
 
   useEffect(() => {
     loadTally();
-  }, []);
+  }, [electionId]);
 
   // Surveillance en direct du dépouillement
   useSocketEvent('VOTE_CAST', loadTally);

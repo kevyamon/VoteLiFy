@@ -19,7 +19,7 @@ import {
   RefreshCw,
 } from 'lucide-react';
 
-export const AdminCandidatesTab = () => {
+export const AdminCandidatesTab = ({ electionId }) => {
   const [candidates, setCandidates] = useState([]);
   const [positions, setPositions] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -51,10 +51,11 @@ export const AdminCandidatesTab = () => {
       if (statusFilter) params.status = statusFilter;
       if (positionFilter) params.positionId = positionFilter;
       if (search.trim()) params.search = search.trim();
+      if (electionId) params.electionId = electionId;
 
       const [cands, posList] = await Promise.all([
         api.getAllCandidatesAdmin(params),
-        api.getAllPositionsAdmin(),
+        api.getAllPositionsAdmin(electionId ? { electionId } : {}),
       ]);
 
       setCandidates(cands || []);
@@ -68,7 +69,7 @@ export const AdminCandidatesTab = () => {
 
   useEffect(() => {
     loadData();
-  }, [statusFilter, positionFilter]);
+  }, [statusFilter, positionFilter, electionId]);
 
   // Synchronisation temps réel des candidatures pour la Commission Électorale
   useSocketEvent('CANDIDATE_CREATED', loadData);

@@ -12,6 +12,7 @@ export const VoteModal = ({
   candidate,
   positionName,
   onVoteSuccess,
+  electionId,
 }) => {
   const [pin, setPin] = useState('');
   const [showPin, setShowPin] = useState(false);
@@ -46,6 +47,7 @@ export const VoteModal = ({
       const response = await api.submitVote({
         candidateId: candidate._id,
         pin: pin.trim().toUpperCase(),
+        electionId: candidate.electionId || electionId,
       });
 
       setVoteSuccess(true);
@@ -85,7 +87,7 @@ export const VoteModal = ({
               Vote enregistré avec succès !
             </h4>
             <p className="text-sm text-content-body max-w-xs mx-auto">
-              Merci pour votre participation au scrutin de la FORMATION NO-CODE. Votre suffrage a été scellé dans l’urne anonyme.
+              Merci pour votre participation à ce scrutin démocratique. Votre suffrage a été scellé dans l’urne anonyme.
             </p>
           </div>
 

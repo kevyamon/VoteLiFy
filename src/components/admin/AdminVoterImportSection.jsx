@@ -5,7 +5,7 @@ import { useToast } from '../../context/ToastContext.jsx';
 import { VoterPreviewModal, VoterGeneratedPinsModal } from './AdminVoterModals.jsx';
 import { Upload } from 'lucide-react';
 
-export const AdminVoterImportSection = ({ onImportSuccess }) => {
+export const AdminVoterImportSection = ({ onImportSuccess, electionId }) => {
   const [rawText, setRawText] = useState('');
   const [previewData, setPreviewData] = useState(null);
   const [isPreviewing, setIsPreviewing] = useState(false);
@@ -22,7 +22,7 @@ export const AdminVoterImportSection = ({ onImportSuccess }) => {
     }
     setIsPreviewing(true);
     try {
-      const data = await api.previewVoters({ rawText });
+      const data = await api.previewVoters({ rawText, electionId });
       setPreviewData(data);
     } catch (err) {
       toast.error(err.message || 'Erreur lors de l’analyse des numéros.');
@@ -34,7 +34,7 @@ export const AdminVoterImportSection = ({ onImportSuccess }) => {
   const handleConfirmImport = async () => {
     setIsImporting(true);
     try {
-      const result = await api.importVoters({ rawText });
+      const result = await api.importVoters({ rawText, electionId });
       setGeneratedBatch(result.votersWithPin || []);
       setPreviewData(null);
       setRawText('');

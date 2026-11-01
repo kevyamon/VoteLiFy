@@ -18,7 +18,7 @@ import {
   Trash2,
 } from 'lucide-react';
 
-export const AdminVotersTab = () => {
+export const AdminVotersTab = ({ electionId }) => {
   // Registre des électeurs
   const [voters, setVoters] = useState([]);
   const [pagination, setPagination] = useState({ page: 1, limit: 20, totalPages: 1 });
@@ -41,6 +41,7 @@ export const AdminVotersTab = () => {
       const params = { page, limit: 20 };
       if (search.trim()) params.search = search.trim();
       if (filterVoted !== '') params.hasVoted = filterVoted;
+      if (electionId) params.electionId = electionId;
 
       const data = await api.getVoters(params);
       setVoters(data?.voters || []);
@@ -54,7 +55,7 @@ export const AdminVotersTab = () => {
 
   useEffect(() => {
     loadVoters(1);
-  }, [filterVoted]);
+  }, [filterVoted, electionId]);
 
   // Synchronisation temps réel du registre d'émargement
   useSocketEvent('VOTE_CAST', () => loadVoters(pagination.page));
@@ -63,7 +64,7 @@ export const AdminVotersTab = () => {
 
   const handleExport = async () => {
     try {
-      const data = await api.exportVoters();
+      const data = await api.exportVoters(electionId ? { electionId } : {});
       const jsonString = `data:text/json;charset=utf-8,${encodeURIComponent(JSON.stringify(data, null, 2))}`;
       const downloadAnchor = document.createElement('a');
       downloadAnchor.setAttribute('href', jsonString);
@@ -115,7 +116,7 @@ export const AdminVotersTab = () => {
   return (
     <div className="space-y-8 animate-fade-in">
       {/* 1. Zone d'import des numéros WhatsApp */}
-      <AdminVoterImportSection onImportSuccess={() => loadVoters(1)} />
+      <AdminVoterImportSection onImportSuccess={() => loadVoters(1)} electionId={electionId} />
 
       {/* 2. Registre des Électeurs */}
       <div className="bg-surface-pure rounded-2xl border border-surface-border p-4 sm:p-6 shadow-soft space-y-4">

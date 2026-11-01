@@ -137,10 +137,18 @@ export const ElectionsPage = ({ onNavigate, onSelectElection }) => {
                   <div className="space-y-5">
                     {/* En-tête de carte avec Monogramme (2 premières lettres) et Badge de statut */}
                     <div className="flex items-start justify-between gap-3">
-                      {/* Illustration : deux premières lettres du nom dans un avatar stylisé */}
-                      <div className="w-16 h-16 sm:w-18 sm:h-18 rounded-2xl bg-gradient-to-br from-brand-red via-brand-red to-brand-blue text-white flex items-center justify-center font-black text-2xl tracking-wider shadow-md group-hover:scale-105 transition-transform flex-shrink-0 border-2 border-white">
-                        <span>{election.initials || 'EL'}</span>
-                      </div>
+                      {/* Illustration : Image si présente, sinon deux premières lettres du nom dans un avatar stylisé */}
+                      {election.imageUrl ? (
+                        <img
+                          src={election.imageUrl}
+                          alt={election.title}
+                          className="w-16 h-16 sm:w-18 sm:h-18 rounded-2xl object-cover shadow-md group-hover:scale-105 transition-transform flex-shrink-0 border-2 border-white"
+                        />
+                      ) : (
+                        <div className="w-16 h-16 sm:w-18 sm:h-18 rounded-2xl bg-gradient-to-br from-brand-red via-brand-red to-brand-blue text-white flex items-center justify-center font-black text-2xl tracking-wider shadow-md group-hover:scale-105 transition-transform flex-shrink-0 border-2 border-white">
+                          <span>{election.initials || 'EL'}</span>
+                        </div>
+                      )}
 
                       {/* Badge de statut temps réel */}
                       <div className="flex-shrink-0">
