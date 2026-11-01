@@ -5,6 +5,7 @@ import { VoteModal } from '../components/vote/VoteModal.jsx';
 import { CountdownTimer } from '../components/common/CountdownTimer.jsx';
 import { Button } from '../components/common/Button.jsx';
 import { HomeSkeleton } from '../components/common/Skeleton.jsx';
+import { HomeSeoSection } from '../components/home/HomeSeoSection.jsx';
 import { useSocketEvent } from '../services/socket.js';
 import { UserPlus, RefreshCw, Users } from 'lucide-react';
 
@@ -199,7 +200,10 @@ export const Home = ({ onNavigate }) => {
         )}
       </section>
 
-      {/* 4. Modale de vote sécurisé par PIN */}
+      {/* 4. Section Sémantique SEO & Présentation officielle */}
+      <HomeSeoSection />
+
+      {/* 5. Modale de vote sécurisé par PIN */}
       <VoteModal
         isOpen={voteModalOpen}
         onClose={() => setVoteModalOpen(false)}
