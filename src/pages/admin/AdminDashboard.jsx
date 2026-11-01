@@ -5,6 +5,7 @@ import { useAuth } from '../../context/AuthContext.jsx';
 import { useToast } from '../../context/ToastContext.jsx';
 import { Button } from '../../components/common/Button.jsx';
 import { Badge } from '../../components/common/Badge.jsx';
+import { AdminStatsSkeleton } from '../../components/common/Skeleton.jsx';
 import { AdminVotersTab } from '../../components/admin/AdminVotersTab.jsx';
 import { AdminCandidatesTab } from '../../components/admin/AdminCandidatesTab.jsx';
 import { AdminTallyTab } from '../../components/admin/AdminTallyTab.jsx';
@@ -143,8 +144,11 @@ export const AdminDashboard = ({ onNavigate }) => {
         {/* 1. Onglet Vue d'ensemble (CDC Section 5.3) */}
         {activeTab === 'overview' && (
           <div className="space-y-6 animate-fade-in">
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-              <div className="p-5 bg-surface-pure rounded-2xl border border-surface-border shadow-soft">
+            {isLoadingStats && !stats ? (
+              <AdminStatsSkeleton />
+            ) : (
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="p-5 bg-surface-pure rounded-2xl border border-surface-border shadow-soft">
                 <span className="text-xs font-bold text-content-muted block mb-1">Électeurs Inscrits</span>
                 <span className="text-3xl font-extrabold text-content-title font-mono">
                   {stats?.participation?.totalVoters ?? '—'}
@@ -186,6 +190,7 @@ export const AdminDashboard = ({ onNavigate }) => {
                 </span>
               </div>
             </div>
+          )}
 
             {/* Actions rapides */}
             <div className="p-6 bg-surface-pure rounded-2xl border border-surface-border shadow-soft space-y-3">

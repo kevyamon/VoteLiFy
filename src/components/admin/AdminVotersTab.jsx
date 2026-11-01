@@ -4,6 +4,7 @@ import { useSocketEvent } from '../../services/socket.js';
 import { Button } from '../common/Button.jsx';
 import { Badge } from '../common/Badge.jsx';
 import { CustomSelect } from '../common/CustomSelect.jsx';
+import { AdminVotersSkeleton } from '../common/Skeleton.jsx';
 import { useToast } from '../../context/ToastContext.jsx';
 import { VoterPreviewModal, VoterGeneratedPinsModal } from './AdminVoterModals.jsx';
 import {
@@ -254,11 +255,7 @@ export const AdminVotersTab = () => {
             </thead>
             <tbody className="divide-y divide-surface-border bg-surface-pure font-medium">
               {isLoadingList ? (
-                <tr>
-                  <td colSpan={4} className="px-4 py-8 text-center text-content-muted">
-                    Chargement du registre...
-                  </td>
-                </tr>
+                <AdminVotersSkeleton />
               ) : voters.length === 0 ? (
                 <tr>
                   <td colSpan={4} className="px-4 py-8 text-center text-content-muted">

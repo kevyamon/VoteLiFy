@@ -122,8 +122,8 @@ export const api = {
     return request(`/admin/candidates${query ? `?${query}` : ''}`);
   },
   getCandidateByIdAdmin: (id) => request(`/admin/candidates/${id}`),
-  approveCandidate: (id, data = {}) => request(`/admin/candidates/${id}/approve`, { method: 'PATCH', body: data }),
-  rejectCandidate: (id, data = {}) => request(`/admin/candidates/${id}/reject`, { method: 'PATCH', body: data }),
+  approveCandidate: (id, data = {}) => request(`/admin/candidates/${id}/approve`, { method: 'PATCH', body: { status: 'approved', ...data } }),
+  rejectCandidate: (id, data = {}) => request(`/admin/candidates/${id}/reject`, { method: 'PATCH', body: { status: 'rejected', ...data } }),
   updateCandidateAdmin: (id, data) => request(`/admin/candidates/${id}`, { method: 'PATCH', body: data }),
   deleteCandidateAdmin: (id) => request(`/admin/candidates/${id}`, { method: 'DELETE' }),
 };

@@ -4,6 +4,7 @@ import { Button } from '../components/common/Button.jsx';
 import { Badge } from '../components/common/Badge.jsx';
 import { CountdownTimer } from '../components/common/CountdownTimer.jsx';
 import { ResultsSkeleton } from '../components/common/Skeleton.jsx';
+import { ResultsParticipationCards } from '../components/results/ResultsParticipationCards.jsx';
 import { useSocketEvent } from '../services/socket.js';
 import {
   Award,
@@ -223,34 +224,7 @@ export const ResultsPage = ({ onNavigate }) => {
 
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
             {/* Statistiques globales officielles de participation (CDC Section 10.3) */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div className="p-5 bg-surface-pure rounded-2xl border border-surface-border shadow-soft text-center">
-                <span className="text-xs font-bold text-content-muted uppercase tracking-wider block mb-1">
-                  Électeurs Inscrits
-                </span>
-                <span className="text-3xl font-extrabold text-content-title font-mono">
-                  {resultsData?.participation?.totalVoters ?? '—'}
-                </span>
-              </div>
-
-              <div className="p-5 bg-surface-pure rounded-2xl border border-surface-border shadow-soft text-center">
-                <span className="text-xs font-bold text-emerald-700 uppercase tracking-wider block mb-1">
-                  Suffrages Exprimés
-                </span>
-                <span className="text-3xl font-extrabold text-emerald-600 font-mono">
-                  {resultsData?.participation?.totalVotesCast ?? '—'}
-                </span>
-              </div>
-
-              <div className="p-5 bg-surface-pure rounded-2xl border border-surface-border shadow-soft text-center">
-                <span className="text-xs font-bold text-brand-red uppercase tracking-wider block mb-1">
-                  Taux de Participation
-                </span>
-                <span className="text-3xl font-extrabold text-brand-red font-mono">
-                  {resultsData?.participation?.participationRate ?? 0} %
-                </span>
-              </div>
-            </div>
+            <ResultsParticipationCards participation={resultsData?.participation} />
 
             {/* Résultats détaillés par poste électoral (CDC Section 10.4 & 10.5) */}
             <div className="space-y-8">
@@ -300,61 +274,78 @@ export const ResultsPage = ({ onNavigate }) => {
                       return (
                         <div
                           key={cand.candidateId}
-                          className={`p-4 rounded-xl border transition-all ${
+                          className={`group p-4 sm:p-5 rounded-2xl border transition-all duration-300 ${
                             isWinner
-                              ? 'bg-amber-50/40 border-amber-300 ring-1 ring-amber-300 shadow-sm'
-                              : 'bg-surface-base border-surface-border'
+                              ? 'bg-gradient-to-r from-amber-500/15 via-amber-50/60 to-surface-pure border-amber-400/90 ring-2 ring-amber-300/40 shadow-md hover:shadow-lg hover:-translate-y-0.5'
+                              : 'bg-surface-pure border-surface-border hover:border-slate-300 hover:shadow-soft hover:-translate-y-0.5'
                           }`}
                         >
-                          <div className="flex items-center justify-between gap-4 mb-2">
-                            <div className="flex items-center gap-3">
-                              {/* Rang ou trophée */}
-                              <div className="w-8 h-8 rounded-full flex items-center justify-center font-bold font-mono text-xs flex-shrink-0 bg-surface-subtle border border-surface-border">
-                                {isWinner ? (
-                                  <Trophy className="w-4 h-4 text-amber-600" />
-                                ) : (
-                                  `#${idx + 1}`
-                                )}
+                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-3">
+                            <div className="flex items-center gap-3.5">
+                              {/* Rang ou trophée doré animé */}
+                              <div
+                                className={`w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center font-bold font-mono text-xs flex-shrink-0 transition-transform duration-300 group-hover:scale-110 ${
+                                  isWinner
+                                    ? 'bg-gradient-to-br from-amber-400 to-amber-500 text-white shadow-sm ring-2 ring-amber-300/60'
+                                    : 'bg-surface-subtle text-content-body border border-surface-border'
+                                }`}
+                              >
+                                {isWinner ? <Trophy className="w-5 h-5 text-white animate-pulse" /> : `#${idx + 1}`}
                               </div>
 
                               {cand.photoUrl && (
                                 <img
                                   src={cand.photoUrl}
                                   alt={cand.fullName}
-                                  className="w-10 h-10 rounded-full object-cover border border-surface-border flex-shrink-0"
+                                  className={`w-14 h-14 sm:w-16 sm:h-16 rounded-2xl object-cover flex-shrink-0 transition-all duration-300 group-hover:scale-105 ${
+                                    isWinner
+                                      ? 'border-2 border-amber-400 ring-2 ring-amber-300/60 shadow-md shadow-amber-500/20'
+                                      : 'border border-surface-border shadow-xs'
+                                  }`}
                                 />
                               )}
 
                               <div>
-                                <h3 className="text-sm font-bold text-content-title flex items-center gap-2">
+                                <h3 className="text-base sm:text-lg font-extrabold text-content-title flex items-center gap-2">
                                   <span>{cand.fullName}</span>
                                   {isWinner && (
-                                    <span className="text-[10px] font-bold uppercase tracking-wider text-amber-800 bg-amber-100 px-2 py-0.5 rounded-full border border-amber-200">
-                                      Élu
+                                    <span className="inline-flex items-center gap-1 text-[11px] font-extrabold uppercase tracking-wider text-amber-900 bg-gradient-to-r from-amber-200 to-amber-300 px-2.5 py-0.5 rounded-full border border-amber-400/60 shadow-xs">
+                                      ★ Élu Officiellement
                                     </span>
                                   )}
                                 </h3>
+                                <p className="text-xs text-content-muted mt-0.5 font-medium">
+                                  Candidat officiel · Scrutin certifié
+                                </p>
                               </div>
                             </div>
 
-                            {/* Voix et pourcentage */}
-                            <div className="text-right font-mono">
-                              <span className="text-base font-extrabold text-content-title">
-                                {cand.votes} voix
+                            {/* Voix et pourcentage avec badge prestigieux */}
+                            <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-center border-t sm:border-t-0 pt-2 sm:pt-0 border-surface-border/60">
+                              <span className="text-lg sm:text-2xl font-black text-content-title font-mono tracking-tight">
+                                {cand.votes} <span className="text-xs font-semibold text-content-muted">voix</span>
                               </span>
-                              <span className="block text-xs font-bold text-brand-red">
+                              <span
+                                className={`text-xs sm:text-sm font-extrabold font-mono px-2 py-0.5 rounded-md ${
+                                  isWinner
+                                    ? 'text-amber-800 bg-amber-100/90 border border-amber-300'
+                                    : 'text-brand-red bg-red-50 border border-red-200/60'
+                                }`}
+                              >
                                 {cand.percentage} %
                               </span>
                             </div>
                           </div>
 
-                          {/* Barre de progression des suffrages */}
-                          <div className="w-full bg-slate-100 rounded-full h-3 overflow-hidden">
+                          {/* Barre de progression des suffrages avec micro-animation */}
+                          <div className="w-full bg-slate-100/90 rounded-full h-3.5 overflow-hidden p-0.5 border border-surface-border/40">
                             <div
-                              className={`h-full rounded-full transition-all duration-700 ${
-                                isWinner ? 'bg-amber-500' : 'bg-brand-red'
+                              className={`h-full rounded-full transition-all duration-1000 ease-out ${
+                                isWinner
+                                  ? 'bg-gradient-to-r from-amber-400 via-amber-500 to-yellow-500 shadow-sm'
+                                  : 'bg-gradient-to-r from-brand-red to-rose-500'
                               }`}
-                              style={{ width: `${cand.percentage}%` }}
+                              style={{ width: `${Math.max(2, cand.percentage)}%` }}
                             />
                           </div>
                         </div>

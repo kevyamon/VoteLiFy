@@ -108,3 +108,74 @@ export const ApplySkeleton = () => (
     </div>
   </div>
 );
+
+/**
+ * Skeleton pour la modération des candidatures dans le back-office.
+ */
+export const AdminCandidatesSkeleton = () => (
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 animate-pulse">
+    {[1, 2, 3, 4].map((n) => (
+      <div
+        key={n}
+        className="p-4 rounded-xl border border-surface-border bg-surface-base/60 space-y-3"
+      >
+        <div className="flex items-start gap-3">
+          <SkeletonBox className="w-16 h-16 rounded-xl flex-shrink-0" />
+          <div className="flex-1 space-y-2">
+            <div className="flex justify-between items-center">
+              <SkeletonBox className="h-4 w-32 rounded" />
+              <SkeletonBox className="h-4 w-16 rounded-full" />
+            </div>
+            <SkeletonBox className="h-3 w-24 rounded" />
+            <SkeletonBox className="h-3 w-28 rounded" />
+          </div>
+        </div>
+        <SkeletonBox className="h-14 w-full rounded-lg" />
+        <div className="flex justify-end gap-2 pt-1">
+          <SkeletonBox className="h-8 w-20 rounded-xl" />
+          <SkeletonBox className="h-8 w-20 rounded-xl" />
+        </div>
+      </div>
+    ))}
+  </div>
+);
+
+/**
+ * Skeleton pour les lignes du registre d'émargement des électeurs.
+ */
+export const AdminVotersSkeleton = () => (
+  <>
+    {[1, 2, 3, 4, 5].map((n) => (
+      <tr key={n} className="animate-pulse border-b border-surface-border/50">
+        <td className="px-4 py-3.5">
+          <SkeletonBox className="h-4 w-28 rounded" />
+        </td>
+        <td className="px-4 py-3.5">
+          <SkeletonBox className="h-5 w-20 rounded-full" />
+        </td>
+        <td className="px-4 py-3.5">
+          <SkeletonBox className="h-4 w-24 rounded" />
+        </td>
+        <td className="px-4 py-3.5">
+          <SkeletonBox className="h-4 w-16 rounded" />
+        </td>
+      </tr>
+    ))}
+  </>
+);
+
+/**
+ * Skeleton pour les cartes statistiques du Dashboard Admin.
+ */
+export const AdminStatsSkeleton = () => (
+  <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 animate-pulse">
+    {[1, 2, 3, 4].map((n) => (
+      <div key={n} className="p-5 bg-surface-pure rounded-2xl border border-surface-border shadow-soft space-y-3">
+        <SkeletonBox className="h-3 w-24 rounded" />
+        <SkeletonBox className="h-8 w-16 rounded-lg" />
+        <SkeletonBox className="h-3 w-32 rounded" />
+      </div>
+    ))}
+  </div>
+);
+

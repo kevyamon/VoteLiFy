@@ -5,6 +5,7 @@ import { Button } from '../common/Button.jsx';
 import { Badge } from '../common/Badge.jsx';
 import { CustomSelect } from '../common/CustomSelect.jsx';
 import { ConfirmModal } from '../common/ConfirmModal.jsx';
+import { AdminCandidatesSkeleton } from '../common/Skeleton.jsx';
 import { CandidateRejectModal, CandidateEditModal } from './AdminCandidateModals.jsx';
 import { useToast } from '../../context/ToastContext.jsx';
 import {
@@ -213,7 +214,7 @@ export const AdminCandidatesTab = () => {
 
       {/* Liste des candidatures */}
       {isLoading ? (
-        <div className="py-12 text-center text-xs text-content-muted">Chargement des candidatures...</div>
+        <AdminCandidatesSkeleton />
       ) : candidates.length === 0 ? (
         <div className="py-12 text-center text-xs text-content-muted">Aucune candidature correspondante.</div>
       ) : (
