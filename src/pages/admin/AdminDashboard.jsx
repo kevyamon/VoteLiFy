@@ -80,7 +80,7 @@ export const AdminDashboard = ({ onNavigate }) => {
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1.5 sm:gap-3">
             <div className="hidden sm:flex items-center gap-2 px-3 py-1 bg-surface-subtle rounded-xl border border-surface-border text-xs">
               <Shield className="w-3.5 h-3.5 text-brand-red" />
               <span className="font-bold text-content-title">{admin?.username || 'Administrateur'}</span>
@@ -92,7 +92,7 @@ export const AdminDashboard = ({ onNavigate }) => {
               icon={<ExternalLink className="w-3.5 h-3.5" />}
               onClick={() => onNavigate('home')}
             >
-              Voir le site
+              <span className="hidden sm:inline">Voir le site</span>
             </Button>
 
             <Button
@@ -101,7 +101,7 @@ export const AdminDashboard = ({ onNavigate }) => {
               icon={<LogOut className="w-3.5 h-3.5 text-brand-red" />}
               onClick={handleLogout}
             >
-              Déconnexion
+              <span className="hidden sm:inline">Déconnexion</span>
             </Button>
           </div>
         </div>

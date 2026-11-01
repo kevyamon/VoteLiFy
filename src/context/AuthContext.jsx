@@ -9,11 +9,21 @@ export const AuthProvider = ({ children }) => {
 
   // Vérification de la session active au chargement
   const checkAuth = async () => {
+    const storedToken = typeof window !== 'undefined' ? localStorage.getItem('votelify_admin_token') : null;
+    if (!storedToken) {
+      setAdmin(null);
+      setIsLoading(false);
+      return;
+    }
+
     try {
       const data = await api.getMe();
       setAdmin(data);
     } catch {
       setAdmin(null);
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('votelify_admin_token');
+      }
     } finally {
       setIsLoading(false);
     }

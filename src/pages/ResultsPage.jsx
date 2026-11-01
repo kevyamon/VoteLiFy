@@ -55,23 +55,18 @@ export const ResultsPage = ({ onNavigate }) => {
       {!isPublished ? (
         <section className="max-w-3xl mx-auto px-4 sm:px-6 py-10 space-y-8 animate-fade-in">
           {/* Carte descriptive officielle de l'élection */}
-          <div className="bg-surface-pure rounded-2xl border border-surface-border p-6 sm:p-8 shadow-soft space-y-5">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-surface-border gap-3">
-              <div className="flex items-center gap-3">
-                <div className="p-2.5 bg-blue-50 text-brand-blue rounded-xl">
-                  <ShieldCheck className="w-6 h-6" />
+          <div className="bg-surface-pure rounded-2xl border border-surface-border p-4 sm:p-8 shadow-soft space-y-5">
+            {/* Barre supérieure : Catégorie + Badge de statut */}
+            <div className="flex items-center justify-between pb-3 border-b border-surface-border gap-2">
+              <div className="flex items-center gap-2">
+                <div className="p-1.5 sm:p-2 bg-blue-50 text-brand-blue rounded-xl flex-shrink-0">
+                  <ShieldCheck className="w-4 h-4 sm:w-5 sm:h-5" />
                 </div>
-                <div>
-                  <span className="text-[11px] font-bold text-brand-blue uppercase tracking-wider block">
-                    Scrutin Communautaire
-                  </span>
-                  <h2 className="text-xl sm:text-2xl font-extrabold text-content-title">
-                    {electionInfo?.title || resultsData?.title || 'Élection des responsables — Communauté No-Code'}
-                  </h2>
-                </div>
+                <span className="text-[11px] sm:text-xs font-bold text-brand-blue uppercase tracking-wider">
+                  Scrutin Communautaire
+                </span>
               </div>
 
-              {/* Statut dynamique de l'élection */}
               <div>
                 {isVotingOpen ? (
                   <Badge variant="success" dot={true} size="sm">
@@ -87,6 +82,32 @@ export const ResultsPage = ({ onNavigate }) => {
                   </Badge>
                 )}
               </div>
+            </div>
+
+            {/* Titre principal adapté : 2 lignes sur mobile, 1 ligne sur ordinateur */}
+            <div>
+              {(() => {
+                const fullTitle =
+                  electionInfo?.title || resultsData?.title || 'Élection des responsables — Communauté No-Code';
+                const parts = fullTitle.split(/—|-/);
+                if (parts.length >= 2) {
+                  const prefix = parts[0].trim();
+                  const suffix = parts.slice(1).join('—').trim();
+                  return (
+                    <h2 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-content-title tracking-tight leading-snug">
+                      <span className="block md:inline">{prefix} — </span>
+                      <span className="block md:inline text-brand-red md:text-content-title">
+                        {suffix}
+                      </span>
+                    </h2>
+                  );
+                }
+                return (
+                  <h2 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-content-title tracking-tight leading-snug">
+                    {fullTitle}
+                  </h2>
+                );
+              })()}
             </div>
 
             <p className="text-sm text-content-body leading-relaxed">

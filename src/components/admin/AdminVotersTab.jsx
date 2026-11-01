@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { api } from '../../services/api.js';
 import { Button } from '../common/Button.jsx';
 import { Badge } from '../common/Badge.jsx';
+import { CustomSelect } from '../common/CustomSelect.jsx';
 import { useToast } from '../../context/ToastContext.jsx';
 import { VoterPreviewModal, VoterGeneratedPinsModal } from './AdminVoterModals.jsx';
 import {
@@ -108,7 +109,7 @@ export const AdminVotersTab = () => {
   return (
     <div className="space-y-8 animate-fade-in">
       {/* 1. Zone d'import des numéros WhatsApp (CDC Section 7.2) */}
-      <div className="bg-surface-pure rounded-2xl border border-surface-border p-6 shadow-soft space-y-4">
+      <div className="bg-surface-pure rounded-2xl border border-surface-border p-4 sm:p-6 shadow-soft space-y-4">
         <div className="flex items-center gap-3 pb-3 border-b border-surface-border">
           <div className="p-2 bg-brand-red-light text-brand-red rounded-xl">
             <Upload className="w-5 h-5" />
@@ -174,7 +175,7 @@ export const AdminVotersTab = () => {
       />
 
       {/* 2. Registre des Électeurs (CDC Section 7.6) */}
-      <div className="bg-surface-pure rounded-2xl border border-surface-border p-6 shadow-soft space-y-4">
+      <div className="bg-surface-pure rounded-2xl border border-surface-border p-4 sm:p-6 shadow-soft space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
             <h3 className="text-lg font-bold text-content-title flex items-center gap-2">
@@ -216,25 +217,27 @@ export const AdminVotersTab = () => {
               onChange={(e) => setSearch(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && loadVoters(1)}
               placeholder="Rechercher par numéro de téléphone..."
-              className="w-full pl-9 pr-4 py-2 bg-surface-base border border-surface-border rounded-xl text-xs focus:border-brand-red focus:outline-none"
+              className="w-full pl-9 pr-4 py-2.5 bg-surface-base border border-surface-border rounded-xl text-xs focus:border-brand-red focus:outline-none"
             />
             <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
           </div>
 
-          <select
+          <CustomSelect
             value={filterVoted}
-            onChange={(e) => setFilterVoted(e.target.value)}
-            className="w-full px-3 py-2 bg-surface-base border border-surface-border rounded-xl text-xs focus:border-brand-red focus:outline-none cursor-pointer"
-          >
-            <option value="">Tous les statuts de vote</option>
-            <option value="true">A déjà voté</option>
-            <option value="false">N'a pas encore voté</option>
-          </select>
+            onChange={(val) => setFilterVoted(val)}
+            placeholder="Tous les statuts de vote"
+            title="Statut de participation"
+            options={[
+              { value: '', label: 'Tous les statuts de vote' },
+              { value: 'true', label: 'A déjà voté' },
+              { value: 'false', label: "N'a pas encore voté" },
+            ]}
+          />
         </div>
 
-        {/* Tableau */}
+        {/* Tableau scrollable horizontalement sur mobile sans casser la mise en page */}
         <div className="overflow-x-auto rounded-xl border border-surface-border">
-          <table className="w-full text-left text-xs">
+          <table className="w-full min-w-[540px] text-left text-xs">
             <thead className="bg-surface-subtle border-b border-surface-border text-content-muted uppercase tracking-wider text-[10px]">
               <tr>
                 <th className="px-4 py-3 font-bold">Numéro WhatsApp</th>

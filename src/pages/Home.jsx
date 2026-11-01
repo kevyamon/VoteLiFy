@@ -70,9 +70,27 @@ export const Home = ({ onNavigate }) => {
       {/* 1. Bannière de présentation officielle du scrutin (CDC Section 5.2) */}
       <section className="bg-gradient-to-b from-surface-subtle to-surface-base border-b border-surface-border py-12 md:py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6">
-          <h1 className="whitespace-nowrap text-[clamp(12px,3.7vw,36px)] font-extrabold text-content-title tracking-tight max-w-none mx-auto leading-tight">
-            {electionInfo?.title || 'Élection des responsables — Communauté No-Code'}
-          </h1>
+          {(() => {
+            const fullTitle = electionInfo?.title || 'Élection des responsables — Communauté No-Code';
+            const parts = fullTitle.split(/—|-/);
+            if (parts.length >= 2) {
+              const prefix = parts[0].trim();
+              const suffix = parts.slice(1).join('—').trim();
+              return (
+                <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold text-content-title tracking-tight max-w-4xl mx-auto leading-tight">
+                  <span className="block md:inline">{prefix} — </span>
+                  <span className="block md:inline text-brand-red md:text-content-title">
+                    {suffix}
+                  </span>
+                </h1>
+              );
+            }
+            return (
+              <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold text-content-title tracking-tight max-w-4xl mx-auto leading-tight">
+                {fullTitle}
+              </h1>
+            );
+          })()}
 
           <p className="text-base sm:text-lg text-content-body max-w-2xl mx-auto leading-relaxed">
             {electionInfo?.description ||

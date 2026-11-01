@@ -10,9 +10,12 @@ const API_BASE = rawBase
 async function request(endpoint, options = {}) {
   const url = `${API_BASE}${endpoint.startsWith('/') ? endpoint : `/${endpoint}`}`;
 
+  const storedToken = typeof window !== 'undefined' ? localStorage.getItem('votelify_admin_token') : null;
+
   const defaultHeaders = {
     'Content-Type': 'application/json',
     Accept: 'application/json',
+    ...(storedToken ? { Authorization: `Bearer ${storedToken}` } : {}),
   };
 
   const config = {
@@ -21,7 +24,7 @@ async function request(endpoint, options = {}) {
       ...defaultHeaders,
       ...options.headers,
     },
-    credentials: 'include', // Indispensable pour la transmission des cookies HttpOnly de session
+    credentials: 'include', // Transmission des cookies HttpOnly si autorisée
   };
 
   if (options.body && typeof options.body === 'object') {
@@ -61,9 +64,29 @@ export const api = {
   getResults: () => request('/results'),
 
   // Authentification administrative
-  registerAdmin: (data) => request('/admin/register', { method: 'POST', body: data }),
-  loginAdmin: (data) => request('/admin/login', { method: 'POST', body: data }),
-  logoutAdmin: () => request('/admin/logout', { method: 'POST' }),
+  registerAdmin: async (data) => {
+    const res = await request('/admin/register', { method: 'POST', body: data });
+    if (res?.token && typeof window !== 'undefined') {
+      localStorage.setItem('votelify_admin_token', res.token);
+    }
+    return res;
+  },
+  loginAdmin: async (data) => {
+    const res = await request('/admin/login', { method: 'POST', body: data });
+    if (res?.token && typeof window !== 'undefined') {
+      localStorage.setItem('votelify_admin_token', res.token);
+    }
+    return res;
+  },
+  logoutAdmin: async () => {
+    try {
+      return await request('/admin/logout', { method: 'POST' });
+    } finally {
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('votelify_admin_token');
+      }
+    }
+  },
   getMe: () => request('/admin/me'),
 
   // Dashboard et Contrôle du scrutin

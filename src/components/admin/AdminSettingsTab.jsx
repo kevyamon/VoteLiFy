@@ -3,6 +3,7 @@ import { api } from '../../services/api.js';
 import { Button } from '../common/Button.jsx';
 import { Badge } from '../common/Badge.jsx';
 import { useToast } from '../../context/ToastContext.jsx';
+import { ConfirmModal } from '../common/ConfirmModal.jsx';
 import { AdminDangerZone } from './AdminDangerZone.jsx';
 import {
   Settings,
@@ -26,6 +27,9 @@ export const AdminSettingsTab = () => {
   const [newPositionName, setNewPositionName] = useState('');
   const [newPositionDesc, setNewPositionDesc] = useState('');
   const [isCreatingPosition, setIsCreatingPosition] = useState(false);
+
+  // Modale personnalisée de suppression de poste
+  const [positionToDelete, setPositionToDelete] = useState(null);
 
 
 
@@ -135,11 +139,12 @@ export const AdminSettingsTab = () => {
     }
   };
 
-  const handleDeletePosition = async (id, name) => {
-    if (!window.confirm(`Voulez-vous supprimer le poste « ${name} » ?`)) return;
+  const handleConfirmDeletePosition = async () => {
+    if (!positionToDelete) return;
     try {
-      await api.deletePosition(id);
-      toast.success(`Poste « ${name} » supprimé.`);
+      await api.deletePosition(positionToDelete._id);
+      toast.success(`Poste « ${positionToDelete.name} » supprimé.`);
+      setPositionToDelete(null);
       loadData();
     } catch (err) {
       toast.error(err.message || 'Action impossible.');
@@ -158,7 +163,7 @@ export const AdminSettingsTab = () => {
   return (
     <div className="space-y-8 animate-fade-in">
       {/* 1. Pilotage des périodes électorales (CDC Section 6) */}
-      <div className="bg-surface-pure rounded-2xl border border-surface-border p-6 shadow-soft space-y-4">
+      <div className="bg-surface-pure rounded-2xl border border-surface-border p-4 sm:p-6 shadow-soft space-y-4">
         <div className="flex items-center gap-3 pb-3 border-b border-surface-border">
           <Calendar className="w-5 h-5 text-brand-red" />
           <h3 className="text-lg font-bold text-content-title">Contrôle des Périodes du Scrutin</h3>
@@ -235,7 +240,7 @@ export const AdminSettingsTab = () => {
       </div>
 
       {/* 2. Paramètres généraux de l'élection */}
-      <form onSubmit={handleSaveGeneralSettings} className="bg-surface-pure rounded-2xl border border-surface-border p-6 shadow-soft space-y-4">
+      <form onSubmit={handleSaveGeneralSettings} className="bg-surface-pure rounded-2xl border border-surface-border p-4 sm:p-6 shadow-soft space-y-4">
         <div className="flex items-center gap-3 pb-3 border-b border-surface-border">
           <Settings className="w-5 h-5 text-brand-blue" />
           <h3 className="text-lg font-bold text-content-title">Informations Générales</h3>
@@ -278,7 +283,7 @@ export const AdminSettingsTab = () => {
       </form>
 
       {/* 3. Configuration des Postes Électoraux */}
-      <div className="bg-surface-pure rounded-2xl border border-surface-border p-6 shadow-soft space-y-4">
+      <div className="bg-surface-pure rounded-2xl border border-surface-border p-4 sm:p-6 shadow-soft space-y-4">
         <h3 className="text-lg font-bold text-content-title pb-3 border-b border-surface-border">
           Postes Électoraux à Pourvoir
         </h3>
@@ -297,7 +302,7 @@ export const AdminSettingsTab = () => {
                 variant="ghost"
                 size="sm"
                 icon={<Trash2 className="w-3.5 h-3.5 text-slate-400 hover:text-brand-red" />}
-                onClick={() => handleDeletePosition(pos._id, pos.name)}
+                onClick={() => setPositionToDelete(pos)}
               />
             </div>
           ))}
@@ -327,6 +332,17 @@ export const AdminSettingsTab = () => {
 
       {/* 4. Zone Dangereuse — Réinitialisation (CDC Section 9.5) */}
       <AdminDangerZone onResetSuccess={loadData} />
+
+      {/* Modale personnalisée de suppression de poste */}
+      <ConfirmModal
+        isOpen={Boolean(positionToDelete)}
+        onClose={() => setPositionToDelete(null)}
+        onConfirm={handleConfirmDeletePosition}
+        title="Supprimer le poste électoral"
+        message={`Confirmez-vous la suppression du poste « ${positionToDelete?.name} » ? Les candidatures rattachées ne seront plus assignées.`}
+        confirmText="Supprimer le poste"
+        variant="danger"
+      />
     </div>
   );
 };

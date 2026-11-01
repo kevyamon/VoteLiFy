@@ -11,11 +11,52 @@ import { AdminLoginModal } from './components/admin/AdminLoginModal.jsx';
 import { api } from './services/api.js';
 
 function MainApp() {
-  const [currentPage, setCurrentPage] = useState('home');
+  const { isAuthenticated } = useAuth();
+
+  // Résolution de la vue active depuis le hash URL
+  const getPageFromHash = () => {
+    if (typeof window === 'undefined') return 'home';
+    const hash = window.location.hash.replace(/^#/, '');
+    return ['home', 'apply', 'results', 'admin'].includes(hash) ? hash : 'home';
+  };
+
+  const [currentPage, setCurrentPage] = useState(getPageFromHash);
   const [electionInfo, setElectionInfo] = useState(null);
   const [adminAuthModalOpen, setAdminAuthModalOpen] = useState(false);
 
-  const { isAuthenticated } = useAuth();
+  // Initialisation propre de l'état dans l'historique du navigateur
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const initial = getPageFromHash();
+      if (!window.history.state || window.history.state.page !== initial) {
+        window.history.replaceState({ page: initial }, '', `#${initial}`);
+      }
+    }
+  }, []);
+
+  // Navigation synchronisée avec l'historique du téléphone (bouton Retour physique/geste)
+  const navigateTo = (page, replace = false) => {
+    if (page === currentPage) return;
+    if (typeof window !== 'undefined') {
+      if (replace) {
+        window.history.replaceState({ page }, '', `#${page}`);
+      } else {
+        window.history.pushState({ page }, '', `#${page}`);
+      }
+    }
+    setCurrentPage(page);
+  };
+
+  // Écoute du geste / bouton Retour du téléphone mobile
+  useEffect(() => {
+    const handlePopState = (e) => {
+      const targetPage = e.state?.page || getPageFromHash();
+      setCurrentPage(targetPage);
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
 
   const fetchElectionInfo = async () => {
     try {
@@ -47,7 +88,7 @@ function MainApp() {
         <div className="min-h-screen flex flex-col bg-surface-base">
           <Header
             electionInfo={electionInfo}
-            onNavigate={setCurrentPage}
+            onNavigate={navigateTo}
             currentPage="home"
             onOpenAdminLogin={() => setAdminAuthModalOpen(true)}
           />
@@ -69,14 +110,14 @@ function MainApp() {
             onClose={() => setAdminAuthModalOpen(false)}
             onSuccess={() => {
               setAdminAuthModalOpen(false);
-              setCurrentPage('admin');
+              navigateTo('admin');
             }}
           />
         </div>
       );
     }
 
-    return <AdminDashboard onNavigate={setCurrentPage} />;
+    return <AdminDashboard onNavigate={navigateTo} />;
   }
 
   return (
@@ -84,15 +125,15 @@ function MainApp() {
       {/* En-tête officiel */}
       <Header
         electionInfo={electionInfo}
-        onNavigate={setCurrentPage}
+        onNavigate={navigateTo}
         currentPage={currentPage}
         onOpenAdminLogin={() => setAdminAuthModalOpen(true)}
       />
 
       {/* Vues applicatives */}
-      {currentPage === 'home' && <Home onNavigate={setCurrentPage} />}
-      {currentPage === 'apply' && <ApplyCandidate onNavigate={setCurrentPage} />}
-      {currentPage === 'results' && <ResultsPage onNavigate={setCurrentPage} />}
+      {currentPage === 'home' && <Home onNavigate={navigateTo} />}
+      {currentPage === 'apply' && <ApplyCandidate onNavigate={navigateTo} />}
+      {currentPage === 'results' && <ResultsPage onNavigate={navigateTo} />}
 
       {/* Pied de page officiel avec déclencheur 10 secondes */}
       <Footer onOpenAdminAuth={() => setAdminAuthModalOpen(true)} />
@@ -103,7 +144,7 @@ function MainApp() {
         onClose={() => setAdminAuthModalOpen(false)}
         onSuccess={() => {
           setAdminAuthModalOpen(false);
-          setCurrentPage('admin');
+          navigateTo('admin');
         }}
       />
     </div>

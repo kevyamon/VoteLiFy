@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { api } from '../services/api.js';
 import { Button } from '../components/common/Button.jsx';
 import { Badge } from '../components/common/Badge.jsx';
+import { CustomSelect } from '../components/common/CustomSelect.jsx';
 import { useToast } from '../context/ToastContext.jsx';
 import { ApplySuccessState } from '../components/candidate/ApplySuccessState.jsx';
 import { ApplySkeleton } from '../components/common/Skeleton.jsx';
@@ -235,22 +236,15 @@ export const ApplyCandidate = ({ onNavigate }) => {
             <label htmlFor="candidate-position" className="block text-xs font-bold uppercase tracking-wider text-content-title">
               Poste convoité <span className="text-brand-red">*</span>
             </label>
-            <div className="relative">
-              <select
-                id="candidate-position"
-                required={true}
-                value={positionId}
-                onChange={(e) => setPositionId(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 bg-surface-base border border-surface-border rounded-xl text-sm focus:border-brand-red focus:ring-2 focus:ring-brand-red/20 focus:outline-none transition-all appearance-none cursor-pointer"
-              >
-                {positions.map((p) => (
-                  <option key={p._id} value={p._id}>
-                    {p.name}
-                  </option>
-                ))}
-              </select>
-              <Briefcase className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-            </div>
+            <CustomSelect
+              id="candidate-position"
+              value={positionId}
+              onChange={(val) => setPositionId(val)}
+              placeholder="Sélectionnez le poste convoité..."
+              title="Poste convoité"
+              icon={Briefcase}
+              options={positions.map((p) => ({ value: p._id, label: p.name }))}
+            />
           </div>
 
           {/* Champ 4 — Photo officielle */}

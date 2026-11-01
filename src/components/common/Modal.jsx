@@ -45,8 +45,8 @@ export const Modal = ({
         className={`relative w-full ${maxWidth} bg-surface-pure rounded-2xl shadow-elevated border border-surface-border overflow-hidden z-10 animate-scale-up`}
       >
         {/* En-tête de modale */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-surface-border/60 bg-surface-subtle/50">
-          <h3 className="text-base font-bold text-content-title leading-snug truncate pr-2">
+        <div className="flex items-center justify-between px-4 sm:px-6 py-3.5 sm:py-4 border-b border-surface-border/60 bg-surface-subtle/50">
+          <h3 className="text-sm sm:text-base font-bold text-content-title leading-snug truncate pr-2">
             {title}
           </h3>
           <button
@@ -59,7 +59,7 @@ export const Modal = ({
         </div>
 
         {/* Corps de modale */}
-        <div className="p-6 max-h-[80vh] overflow-y-auto no-scrollbar">
+        <div className="p-4 sm:p-6 max-h-[80vh] overflow-y-auto no-scrollbar">
           {children}
         </div>
       </div>

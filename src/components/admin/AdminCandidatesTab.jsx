@@ -2,7 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { api } from '../../services/api.js';
 import { Button } from '../common/Button.jsx';
 import { Badge } from '../common/Badge.jsx';
-import { Modal } from '../common/Modal.jsx';
+import { CustomSelect } from '../common/CustomSelect.jsx';
+import { ConfirmModal } from '../common/ConfirmModal.jsx';
+import { CandidateRejectModal, CandidateEditModal } from './AdminCandidateModals.jsx';
 import { useToast } from '../../context/ToastContext.jsx';
 import {
   Users,
@@ -13,7 +15,6 @@ import {
   Search,
   ExternalLink,
   RefreshCw,
-  Eye,
 } from 'lucide-react';
 
 export const AdminCandidatesTab = () => {
@@ -35,6 +36,9 @@ export const AdminCandidatesTab = () => {
   const [editFullName, setEditFullName] = useState('');
   const [editPitch, setEditPitch] = useState('');
   const [editVideoUrl, setEditVideoUrl] = useState('');
+
+  // Modale de suppression
+  const [candidateToDelete, setCandidateToDelete] = useState(null);
 
   const toast = useToast();
 
@@ -122,21 +126,32 @@ export const AdminCandidatesTab = () => {
     }
   };
 
-  const handleDelete = async (id, name) => {
-    if (!window.confirm(`Confirmez-vous la suppression définitive du candidat « ${name} » ?`)) {
-      return;
-    }
+  const handleConfirmDelete = async () => {
+    if (!candidateToDelete) return;
     try {
-      await api.deleteCandidateAdmin(id);
-      toast.success(`Candidat « ${name} » supprimé.`);
+      await api.deleteCandidateAdmin(candidateToDelete._id);
+      toast.success(`Candidat « ${candidateToDelete.fullName} » supprimé.`);
+      setCandidateToDelete(null);
       loadData();
     } catch (err) {
       toast.error(err.message || 'Impossible de supprimer cette candidature.');
     }
   };
 
+  const statusOptions = [
+    { value: '', label: 'Tous les statuts' },
+    { value: 'pending', label: 'En attente (Pending)' },
+    { value: 'approved', label: 'Approuvées (Approved)' },
+    { value: 'rejected', label: 'Rejetées (Rejected)' },
+  ];
+
+  const positionOptions = [
+    { value: '', label: 'Tous les postes' },
+    ...positions.map((p) => ({ value: p._id, label: p.name })),
+  ];
+
   return (
-    <div className="bg-surface-pure rounded-2xl border border-surface-border p-6 shadow-soft space-y-6 animate-fade-in">
+    <div className="bg-surface-pure rounded-2xl border border-surface-border p-4 sm:p-6 shadow-soft space-y-6 animate-fade-in">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-surface-border">
         <div>
           <h3 className="text-lg font-bold text-content-title flex items-center gap-2">
@@ -159,7 +174,7 @@ export const AdminCandidatesTab = () => {
         </Button>
       </div>
 
-      {/* Barre de filtres */}
+      {/* Barre de filtres sur-mesure */}
       <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
         <div className="sm:col-span-2 relative">
           <input
@@ -168,34 +183,26 @@ export const AdminCandidatesTab = () => {
             onChange={(e) => setSearch(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && loadData()}
             placeholder="Rechercher par nom ou numéro..."
-            className="w-full pl-9 pr-4 py-2 bg-surface-base border border-surface-border rounded-xl text-xs focus:border-brand-red focus:outline-none"
+            className="w-full pl-9 pr-4 py-2.5 bg-surface-base border border-surface-border rounded-xl text-xs focus:border-brand-red focus:outline-none"
           />
           <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
         </div>
 
-        <select
+        <CustomSelect
           value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
-          className="w-full px-3 py-2 bg-surface-base border border-surface-border rounded-xl text-xs focus:border-brand-red focus:outline-none cursor-pointer"
-        >
-          <option value="">Tous les statuts</option>
-          <option value="pending">En attente (Pending)</option>
-          <option value="approved">Approuvées (Approved)</option>
-          <option value="rejected">Rejetées (Rejected)</option>
-        </select>
+          onChange={(val) => setStatusFilter(val)}
+          placeholder="Tous les statuts"
+          title="Statut de candidature"
+          options={statusOptions}
+        />
 
-        <select
+        <CustomSelect
           value={positionFilter}
-          onChange={(e) => setPositionFilter(e.target.value)}
-          className="w-full px-3 py-2 bg-surface-base border border-surface-border rounded-xl text-xs focus:border-brand-red focus:outline-none cursor-pointer"
-        >
-          <option value="">Tous les postes</option>
-          {positions.map((p) => (
-            <option key={p._id} value={p._id}>
-              {p.name}
-            </option>
-          ))}
-        </select>
+          onChange={(val) => setPositionFilter(val)}
+          placeholder="Tous les postes"
+          title="Poste convoité"
+          options={positionOptions}
+        />
       </div>
 
       {/* Liste des candidatures */}
@@ -284,7 +291,7 @@ export const AdminCandidatesTab = () => {
                   variant="ghost"
                   size="sm"
                   icon={<Trash2 className="w-3.5 h-3.5 text-slate-400 hover:text-brand-red" />}
-                  onClick={() => handleDelete(cand._id, cand.fullName)}
+                  onClick={() => setCandidateToDelete(cand)}
                 />
               </div>
             </div>
@@ -292,88 +299,42 @@ export const AdminCandidatesTab = () => {
         </div>
       )}
 
-      {/* Modale de confirmation de rejet */}
-      <Modal
+      {/* Modale personnalisée de confirmation de rejet */}
+      <CandidateRejectModal
         isOpen={rejectModalOpen}
         onClose={() => setRejectModalOpen(false)}
-        title={`Rejeter la candidature de ${selectedCandidate?.fullName}`}
-      >
-        <div className="space-y-4 text-xs">
-          <p className="text-content-body">
-            Indiquez le motif de rejet administratif (non éligible, pièce manquante, etc.) :
-          </p>
-          <textarea
-            rows={3}
-            value={rejectReason}
-            onChange={(e) => setRejectReason(e.target.value)}
-            placeholder="ex : Non-respect des critères de participation à FORMATION NO-CODE 1."
-            className="w-full p-2.5 bg-surface-base border border-surface-border rounded-xl focus:border-brand-red focus:outline-none text-xs"
-          />
-          <div className="flex justify-end gap-2">
-            <Button variant="outline" size="sm" onClick={() => setRejectModalOpen(false)}>
-              Annuler
-            </Button>
-            <Button
-              variant="danger"
-              size="sm"
-              isLoading={isActionLoading}
-              onClick={handleConfirmReject}
-            >
-              Confirmer le rejet
-            </Button>
-          </div>
-        </div>
-      </Modal>
+        candidate={selectedCandidate}
+        rejectReason={rejectReason}
+        onReasonChange={setRejectReason}
+        onConfirmReject={handleConfirmReject}
+        isLoading={isActionLoading}
+      />
 
-      {/* Modale de modification rapide */}
-      <Modal
+      {/* Modale personnalisée de modification rapide */}
+      <CandidateEditModal
         isOpen={editModalOpen}
         onClose={() => setEditModalOpen(false)}
-        title={`Modifier ${selectedCandidate?.fullName}`}
-      >
-        <div className="space-y-3 text-xs">
-          <div>
-            <label className="block font-bold text-content-title mb-1">Nom complet</label>
-            <input
-              type="text"
-              value={editFullName}
-              onChange={(e) => setEditFullName(e.target.value)}
-              className="w-full p-2 bg-surface-base border border-surface-border rounded-xl text-xs"
-            />
-          </div>
-          <div>
-            <label className="block font-bold text-content-title mb-1">Programme / Pitch</label>
-            <textarea
-              rows={4}
-              value={editPitch}
-              onChange={(e) => setEditPitch(e.target.value)}
-              className="w-full p-2 bg-surface-base border border-surface-border rounded-xl text-xs"
-            />
-          </div>
-          <div>
-            <label className="block font-bold text-content-title mb-1">Lien Vidéo</label>
-            <input
-              type="url"
-              value={editVideoUrl}
-              onChange={(e) => setEditVideoUrl(e.target.value)}
-              className="w-full p-2 bg-surface-base border border-surface-border rounded-xl text-xs"
-            />
-          </div>
-          <div className="flex justify-end gap-2 pt-2">
-            <Button variant="outline" size="sm" onClick={() => setEditModalOpen(false)}>
-              Annuler
-            </Button>
-            <Button
-              variant="primary"
-              size="sm"
-              isLoading={isActionLoading}
-              onClick={handleConfirmEdit}
-            >
-              Enregistrer
-            </Button>
-          </div>
-        </div>
-      </Modal>
+        candidate={selectedCandidate}
+        fullName={editFullName}
+        onFullNameChange={setEditFullName}
+        pitch={editPitch}
+        onPitchChange={setEditPitch}
+        videoUrl={editVideoUrl}
+        onVideoUrlChange={setEditVideoUrl}
+        onConfirmEdit={handleConfirmEdit}
+        isLoading={isActionLoading}
+      />
+
+      {/* Modale personnalisée de suppression définitive */}
+      <ConfirmModal
+        isOpen={Boolean(candidateToDelete)}
+        onClose={() => setCandidateToDelete(null)}
+        onConfirm={handleConfirmDelete}
+        title="Supprimer la candidature"
+        message={`Confirmez-vous la suppression définitive du dossier de « ${candidateToDelete?.fullName} » ? Cette action est irréversible.`}
+        confirmText="Supprimer définitivement"
+        variant="danger"
+      />
     </div>
   );
 };
