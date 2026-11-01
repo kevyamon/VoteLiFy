@@ -9,7 +9,7 @@ import { HomeSeoSection } from '../components/home/HomeSeoSection.jsx';
 import { useSocketEvent } from '../services/socket.js';
 import { UserPlus, RefreshCw, Users } from 'lucide-react';
 
-export const Home = ({ onNavigate }) => {
+export const Home = ({ onNavigate, currentElection }) => {
   const [electionInfo, setElectionInfo] = useState(null);
   const [groupedCandidates, setGroupedCandidates] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -77,17 +77,34 @@ export const Home = ({ onNavigate }) => {
   }
 
   // Traitement propre du titre électoral : suppression des "—" cadratins
-  const rawTitle = electionInfo?.title || 'Élection des responsables — Communauté No-Code';
+  const rawTitle = currentElection?.title || electionInfo?.title || 'Élection des responsables — Communauté No-Code';
   const sanitizedTitle = rawTitle.replace(/([a-zA-ZÀ-ÿ])—([a-zA-ZÀ-ÿ])/g, '$1-$2');
   const titleParts = sanitizedTitle.split(/\s*[—–]\s*|\s+-\s+/);
   const line1 = titleParts[0]?.replace(/[—–]/g, '').trim() || 'Élection des responsables';
   const line2 = titleParts.slice(1).join(' ').replace(/[—–]/g, '').trim() || (titleParts.length === 1 ? '' : 'Communauté No-Code');
+  const initials = currentElection?.initials || (rawTitle.replace(/[^a-zA-ZÀ-ÿ0-9]/g, '').slice(0, 2).toUpperCase() || 'EL');
 
   return (
     <main className="flex-1 pb-16">
-      {/* 1. Bannière de présentation officielle du scrutin (CDC Section 5.2) */}
-      <section className="bg-gradient-to-b from-surface-subtle to-surface-base border-b border-surface-border py-12 md:py-16">
+      {/* 1. Bannière de présentation officielle du scrutin */}
+      <section className="bg-gradient-to-b from-surface-subtle to-surface-base border-b border-surface-border py-10 md:py-14">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6">
+          {/* Bouton retour vers toutes les élections */}
+          <div className="flex justify-center">
+            <button
+              onClick={() => onNavigate('elections')}
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-content-muted hover:text-brand-red transition-colors"
+            >
+              <Users className="w-4 h-4" />
+              <span>← Voir toutes les élections</span>
+            </button>
+          </div>
+
+          {/* Monogramme élégant de l'élection */}
+          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-brand-red via-brand-red to-brand-blue text-white flex items-center justify-center font-black text-2xl tracking-wider shadow-md mx-auto border-2 border-white">
+            <span>{initials}</span>
+          </div>
+
           <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold text-content-title tracking-tight max-w-4xl mx-auto leading-tight">
             <span className="block">{line1}</span>
             {line2 && (
@@ -96,11 +113,25 @@ export const Home = ({ onNavigate }) => {
           </h1>
 
           <p className="text-base sm:text-lg text-content-body max-w-2xl mx-auto leading-relaxed">
-            {electionInfo?.description ||
+            {currentElection?.description || electionInfo?.description ||
               'Exprimez votre voix en toute confidentialité grâce à votre code PIN individuel secret et participez activement à la gouvernance de notre communauté.'}
           </p>
 
-          {/* 2. Bloc Compte à rebours dynamique (CDC Section 5.3) */}
+          {/* Bouton pour candidater si période ouverte */}
+          {isCandidacyOpen && (
+            <div className="flex justify-center pt-1">
+              <Button
+                variant="primary"
+                size="md"
+                icon={<UserPlus className="w-4 h-4" />}
+                onClick={() => onNavigate('apply')}
+              >
+                Déposer ma candidature
+              </Button>
+            </div>
+          )}
+
+          {/* 2. Bloc Compte à rebours dynamique (affiché uniquement si une cible est fixée) */}
           {countdownTarget && (
             <div className="pt-2">
               <CountdownTimer targetDate={countdownTarget} label={countdownLabel} />
@@ -108,6 +139,7 @@ export const Home = ({ onNavigate }) => {
           )}
         </div>
       </section>
+
 
       {/* 3. Section des candidats regroupés par poste (CDC Section 5.4) */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10">
@@ -200,11 +232,9 @@ export const Home = ({ onNavigate }) => {
         )}
       </section>
 
-      {/* 4. Section Sémantique SEO & Présentation officielle */}
-      <HomeSeoSection />
-
-      {/* 5. Modale de vote sécurisé par PIN */}
+      {/* 4. Modale de vote sécurisé par PIN */}
       <VoteModal
+
         isOpen={voteModalOpen}
         onClose={() => setVoteModalOpen(false)}
         candidate={selectedCandidate}

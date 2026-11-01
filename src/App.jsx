@@ -3,6 +3,8 @@ import { ToastProvider } from './context/ToastContext.jsx';
 import { AuthProvider, useAuth } from './context/AuthContext.jsx';
 import { Header } from './components/layout/Header.jsx';
 import { Footer } from './components/layout/Footer.jsx';
+import { LandingPage } from './pages/LandingPage.jsx';
+import { ElectionsPage } from './pages/ElectionsPage.jsx';
 import { Home } from './pages/Home.jsx';
 import { ApplyCandidate } from './pages/ApplyCandidate.jsx';
 import { ResultsPage } from './pages/ResultsPage.jsx';
@@ -18,12 +20,15 @@ function MainApp() {
   const getPageFromHash = () => {
     if (typeof window === 'undefined') return 'home';
     const hash = window.location.hash.replace(/^#/, '');
-    return ['home', 'apply', 'results', 'admin'].includes(hash) ? hash : 'home';
+    const validPages = ['home', 'elections', 'election', 'apply', 'results', 'admin'];
+    return validPages.includes(hash) ? hash : 'home';
   };
 
   const [currentPage, setCurrentPage] = useState(getPageFromHash);
+  const [selectedElection, setSelectedElection] = useState(null);
   const [electionInfo, setElectionInfo] = useState(null);
   const [adminAuthModalOpen, setAdminAuthModalOpen] = useState(false);
+
 
   // Fonction universelle de réinitialisation absolue du scroll en haut
   const scrollToTopMobileStyle = () => {
@@ -162,9 +167,22 @@ function MainApp() {
       />
 
       {/* Vues applicatives */}
-      {currentPage === 'home' && <Home onNavigate={navigateTo} />}
+      {currentPage === 'home' && <LandingPage onNavigate={navigateTo} />}
+      {currentPage === 'elections' && (
+        <ElectionsPage
+          onNavigate={navigateTo}
+          onSelectElection={setSelectedElection}
+        />
+      )}
+      {currentPage === 'election' && (
+        <Home
+          onNavigate={navigateTo}
+          currentElection={selectedElection}
+        />
+      )}
       {currentPage === 'apply' && <ApplyCandidate onNavigate={navigateTo} />}
       {currentPage === 'results' && <ResultsPage onNavigate={navigateTo} />}
+
 
       {/* Pied de page officiel avec déclencheur 10 secondes */}
       <Footer onOpenAdminAuth={() => setAdminAuthModalOpen(true)} />

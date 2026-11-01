@@ -22,7 +22,7 @@ export const AdminDangerZone = ({ onResetSuccess }) => {
     setIsResetting(true);
     try {
       await api.resetTestData({ password: adminPasswordConfirm });
-      toast.success('Votes réinitialisés et registres remis à zéro.');
+      toast.success('Votes réinitialisés, émargements et dates remis à zéro.');
       setResetModalOpen(false);
       setAdminPasswordConfirm('');
       if (onResetSuccess) onResetSuccess();
@@ -38,11 +38,12 @@ export const AdminDangerZone = ({ onResetSuccess }) => {
       <div className="p-6 rounded-2xl border border-status-danger/30 bg-red-50/50 space-y-3">
         <div className="flex items-center gap-2 text-status-danger">
           <AlertTriangle className="w-5 h-5 flex-shrink-0" />
-          <h4 className="text-sm font-bold">Zone Dangereuse — Réinitialisation des votes</h4>
+          <h4 className="text-sm font-bold">Zone Dangereuse — Réinitialisation intégrale</h4>
         </div>
         <p className="text-xs text-slate-700 leading-relaxed">
-          Cette opération supprime tous les suffrages enregistrés et réinitialise les statuts d'émargement des électeurs. À n'utiliser que pour les phases de test préliminaires.
+          Cette opération supprime tous les suffrages enregistrés, réinitialise les statuts d'émargement des électeurs et efface l'intégralité des dates et périodes configurées pour repartir d'une base totalement vierge.
         </p>
+
         <Button
           variant="danger"
           size="sm"

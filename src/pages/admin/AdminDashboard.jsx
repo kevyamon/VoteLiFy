@@ -10,6 +10,7 @@ import { AdminVotersTab } from '../../components/admin/AdminVotersTab.jsx';
 import { AdminCandidatesTab } from '../../components/admin/AdminCandidatesTab.jsx';
 import { AdminTallyTab } from '../../components/admin/AdminTallyTab.jsx';
 import { AdminSettingsTab } from '../../components/admin/AdminSettingsTab.jsx';
+import { AdminElectionsTab } from '../../components/admin/AdminElectionsTab.jsx';
 import {
   LayoutDashboard,
   Users,
@@ -21,7 +22,9 @@ import {
   Shield,
   Clock,
   CheckCircle2,
+  Vote,
 } from 'lucide-react';
+
 
 export const AdminDashboard = ({ onNavigate }) => {
   const [activeTab, setActiveTab] = useState('overview');
@@ -67,11 +70,13 @@ export const AdminDashboard = ({ onNavigate }) => {
 
   const navItems = [
     { id: 'overview', label: 'Vue d’ensemble', icon: LayoutDashboard },
+    { id: 'elections', label: 'Gestion des Élections', icon: Vote },
     { id: 'voters', label: 'Électeurs & PINs', icon: Users },
     { id: 'candidates', label: 'Candidatures', icon: Award },
     { id: 'tally', label: 'Dépouillement', icon: BarChart3 },
     { id: 'settings', label: 'Paramètres du Scrutin', icon: Settings },
   ];
+
 
   return (
     <div className="min-h-screen flex flex-col bg-surface-subtle">
@@ -213,18 +218,22 @@ export const AdminDashboard = ({ onNavigate }) => {
           </div>
         )}
 
-        {/* 2. Onglet Électeurs & PINs */}
+        {/* 2. Onglet Gestion des Élections */}
+        {activeTab === 'elections' && <AdminElectionsTab />}
+
+        {/* 3. Onglet Électeurs & PINs */}
         {activeTab === 'voters' && <AdminVotersTab />}
 
-        {/* 3. Onglet Candidatures */}
+        {/* 4. Onglet Candidatures */}
         {activeTab === 'candidates' && <AdminCandidatesTab />}
 
-        {/* 4. Onglet Dépouillement */}
+        {/* 5. Onglet Dépouillement */}
         {activeTab === 'tally' && <AdminTallyTab />}
 
-        {/* 5. Onglet Paramètres du Scrutin */}
+        {/* 6. Onglet Paramètres du Scrutin */}
         {activeTab === 'settings' && <AdminSettingsTab />}
       </main>
     </div>
   );
 };
+

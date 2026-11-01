@@ -93,9 +93,13 @@ export const ResultsPage = ({ onNavigate }) => {
                   <Badge variant="info" dot={true} size="sm">
                     Candidatures ouvertes
                   </Badge>
-                ) : (
+                ) : electionInfo?.voting?.endAt && new Date() > new Date(electionInfo.voting.endAt) ? (
                   <Badge variant="neutral" dot={false} size="sm">
                     Scrutin clos
+                  </Badge>
+                ) : (
+                  <Badge variant="neutral" dot={false} size="sm">
+                    En préparation
                   </Badge>
                 )}
               </div>
@@ -125,7 +129,7 @@ export const ResultsPage = ({ onNavigate }) => {
                   <span className="font-semibold text-content-title">
                     {electionInfo?.voting?.endAt
                       ? `Jusqu'au ${new Date(electionInfo.voting.endAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}`
-                      : 'Période officielle annoncée'}
+                      : 'Date non définie'}
                   </span>
                 </div>
               </div>
@@ -137,11 +141,12 @@ export const ResultsPage = ({ onNavigate }) => {
                   <span className="font-semibold text-content-title">
                     {publishTarget
                       ? new Date(publishTarget).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
-                      : 'À l’issue du dépouillement'}
+                      : 'À l’issue du scrutin'}
                   </span>
                 </div>
               </div>
             </div>
+
           </div>
 
           {/* Bloc d'attente de proclamation avec pulse */}

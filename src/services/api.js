@@ -55,6 +55,8 @@ async function request(endpoint, options = {}) {
 
 export const api = {
   // Routes publiques
+  getElections: () => request('/elections'),
+  getElectionById: (id) => request(`/elections/${id}`),
   getElectionInfo: () => request('/election'),
   getPositions: () => request('/positions'),
   getCandidates: () => request('/candidates'),
@@ -62,6 +64,7 @@ export const api = {
   submitCandidacy: (data) => request('/candidates', { method: 'POST', body: data }),
   submitVote: (data) => request('/votes/submit', { method: 'POST', body: data }),
   getResults: () => request('/results'),
+
 
   // Authentification administrative
   registerAdmin: async (data) => {
@@ -91,8 +94,12 @@ export const api = {
 
   // Dashboard et Contrôle du scrutin
   getDashboardStats: () => request('/admin/dashboard'),
+  getAllElectionsAdmin: () => request('/admin/elections'),
+  createElectionAdmin: (data) => request('/admin/elections', { method: 'POST', body: data }),
+  updateElectionAdmin: (id, data) => request(`/admin/elections/${id}`, { method: 'PATCH', body: data }),
   updateSettings: (data) => request('/admin/election/settings', { method: 'PATCH', body: data }),
   openVoting: () => request('/admin/election/open-voting', { method: 'POST' }),
+
   closeVoting: () => request('/admin/election/close-voting', { method: 'POST' }),
   openCandidacies: () => request('/admin/election/open-candidates', { method: 'POST' }),
   closeCandidacies: () => request('/admin/election/close-candidates', { method: 'POST' }),
