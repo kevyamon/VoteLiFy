@@ -37,6 +37,10 @@ export const ApplyCandidate = ({ onNavigate }) => {
   const toast = useToast();
 
   useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    if (document.documentElement) document.documentElement.scrollTop = 0;
+    if (document.body) document.body.scrollTop = 0;
+
     const fetchPrerequisites = async () => {
       try {
         const [info, posList] = await Promise.all([

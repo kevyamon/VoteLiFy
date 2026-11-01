@@ -71,13 +71,30 @@ function MainApp() {
     fetchElectionInfo();
   }, [currentPage]);
 
-  // Réinitialisation instantanée du scroll en haut comme une application mobile
+  // Réinitialisation instantanée et absolue du scroll en haut comme une application mobile native
   useEffect(() => {
     if (typeof window !== 'undefined') {
       if ('scrollRestoration' in window.history) {
         window.history.scrollRestoration = 'manual';
       }
       window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+      if (document.documentElement) document.documentElement.scrollTop = 0;
+      if (document.body) document.body.scrollTop = 0;
+
+      // Garantir le repositionnement en haut même après le layout et rendu React
+      requestAnimationFrame(() => {
+        window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+        if (document.documentElement) document.documentElement.scrollTop = 0;
+        if (document.body) document.body.scrollTop = 0;
+      });
+
+      const timer = setTimeout(() => {
+        window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+        if (document.documentElement) document.documentElement.scrollTop = 0;
+        if (document.body) document.body.scrollTop = 0;
+      }, 50);
+
+      return () => clearTimeout(timer);
     }
   }, [currentPage]);
 
