@@ -91,6 +91,22 @@ export const LandingPage = ({ onNavigate }) => {
             </Button>
           </div>
 
+          {/* Déclencheur / Flèche rouge animée pour inviter au défilement */}
+          <div className="pt-6 pb-2 flex flex-col items-center justify-center">
+            <button
+              onClick={scrollToFeatures}
+              className="group flex flex-col items-center gap-2 text-content-muted hover:text-brand-red transition-all cursor-pointer focus:outline-none"
+              aria-label="Faire défiler pour mieux connaître VoteLiFy"
+            >
+              <span className="text-xs font-bold tracking-wide uppercase transition-colors group-hover:text-brand-red">
+                Mieux connaître VoteLiFy
+              </span>
+              <div className="w-9 h-9 rounded-full bg-red-50 text-brand-red flex items-center justify-center border border-red-200 shadow-sm animate-bounce group-hover:scale-110 transition-transform">
+                <ChevronDown className="w-5 h-5 stroke-[2.5]" />
+              </div>
+            </button>
+          </div>
+
           {/* Indicateurs clés de confiance avec animation de soulèvement au défilement */}
           <div
             ref={statsRef}
@@ -152,22 +168,6 @@ export const LandingPage = ({ onNavigate }) => {
                 Intégrité Totale
               </span>
             </div>
-          </div>
-
-          {/* Déclencheur / Flèche rouge animée pour inviter au défilement */}
-          <div className="pt-8 flex flex-col items-center justify-center">
-            <button
-              onClick={scrollToFeatures}
-              className="group flex flex-col items-center gap-2 text-content-muted hover:text-brand-red transition-all cursor-pointer focus:outline-none"
-              aria-label="Faire défiler pour mieux connaître VoteLiFy"
-            >
-              <span className="text-xs font-bold tracking-wide uppercase transition-colors group-hover:text-brand-red">
-                Mieux connaître VoteLiFy
-              </span>
-              <div className="w-9 h-9 rounded-full bg-red-50 text-brand-red flex items-center justify-center border border-red-200 shadow-sm animate-bounce group-hover:scale-110 transition-transform">
-                <ChevronDown className="w-5 h-5 stroke-[2.5]" />
-              </div>
-            </button>
           </div>
         </div>
       </section>
