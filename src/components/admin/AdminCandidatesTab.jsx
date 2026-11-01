@@ -242,7 +242,15 @@ export const AdminCandidatesTab = ({ electionId }) => {
                   <p className="text-xs font-semibold text-brand-blue truncate mt-0.5">
                     {cand.positionId?.name || 'Poste non assigné'}
                   </p>
-                  <p className="text-[11px] text-content-muted font-mono">{cand.phone}</p>
+                  <p className="text-[11px] text-content-muted font-mono flex items-center gap-1.5 flex-wrap">
+                    <span>{cand.phone}</span>
+                    {cand.email && (
+                      <>
+                        <span className="text-slate-300">·</span>
+                        <span className="text-slate-600 font-sans">{cand.email}</span>
+                      </>
+                    )}
+                  </p>
                 </div>
               </div>
 

@@ -15,6 +15,7 @@ import {
   FileText,
   User,
   Phone,
+  Mail,
   Briefcase,
 } from 'lucide-react';
 
@@ -28,6 +29,7 @@ export const ApplyCandidate = ({ onNavigate, currentElection }) => {
   // Champs de formulaire
   const [fullName, setFullName] = useState('');
   const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
   const [positionId, setPositionId] = useState('');
   const [photoUrl, setPhotoUrl] = useState('');
   const [photoPreview, setPhotoPreview] = useState('');
@@ -98,8 +100,14 @@ export const ApplyCandidate = ({ onNavigate, currentElection }) => {
     e.preventDefault();
     setErrorMessage('');
 
-    if (!fullName.trim() || !phone.trim() || !positionId || !photoUrl || !pitch.trim()) {
+    if (!fullName.trim() || !phone.trim() || !email.trim() || !positionId || !photoUrl || !pitch.trim()) {
       setErrorMessage('Veuillez renseigner tous les champs obligatoires.');
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email.trim())) {
+      setErrorMessage('Veuillez saisir une adresse email valide pour recevoir vos notifications.');
       return;
     }
 
@@ -112,6 +120,7 @@ export const ApplyCandidate = ({ onNavigate, currentElection }) => {
       await api.submitCandidacy({
         fullName: fullName.trim(),
         phone: phone.trim(),
+        email: email.trim().toLowerCase(),
         positionId,
         photoUrl,
         pitch: pitch.trim(),
@@ -144,22 +153,14 @@ export const ApplyCandidate = ({ onNavigate, currentElection }) => {
           <AlertCircle className="w-8 h-8" />
         </div>
         <div className="space-y-2">
-          <Badge variant="danger" dot={false} size="md">
-            Période Clôturée
-          </Badge>
-          <h1 className="text-3xl font-extrabold text-content-title tracking-tight">
-            Dépôt des candidatures clos
-          </h1>
+          <Badge variant="danger" dot={false} size="md">Période Clôturée</Badge>
+          <h1 className="text-3xl font-extrabold text-content-title tracking-tight">Dépôt des candidatures clos</h1>
           <p className="text-sm text-content-body max-w-md mx-auto leading-relaxed">
             La période officielle de dépôt des candidatures pour le scrutin « {currentElection?.title || electionInfo?.title || 'sélectionné'} » est terminée. Aucun nouveau dossier ne peut être soumis.
           </p>
         </div>
         <div className="pt-4">
-          <Button
-            variant="outline"
-            icon={<ArrowLeft className="w-4 h-4" />}
-            onClick={() => onNavigate('election')}
-          >
+          <Button variant="outline" icon={<ArrowLeft className="w-4 h-4" />} onClick={() => onNavigate('election')}>
             Retourner au scrutin
           </Button>
         </div>
@@ -181,24 +182,17 @@ export const ApplyCandidate = ({ onNavigate, currentElection }) => {
 
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <h1 className="text-3xl font-extrabold text-content-title tracking-tight">
-              Déposer ma candidature
-            </h1>
-            <p className="text-sm text-content-muted mt-1">
-              Remplissez le formulaire officiel pour postuler à un poste électoral.
-            </p>
+            <h1 className="text-3xl font-extrabold text-content-title tracking-tight">Déposer ma candidature</h1>
+            <p className="text-sm text-content-muted mt-1">Remplissez le formulaire officiel pour postuler à un poste électoral.</p>
           </div>
-          <Badge variant="success" dot={true} size="md">
-            Candidatures ouvertes
-          </Badge>
+          <Badge variant="success" dot={true} size="md">Candidatures ouvertes</Badge>
         </div>
 
         {/* Rappel des conditions d'éligibilité (CDC Section 2.2) */}
-        <div className="p-4 bg-blue-50/70 border border-brand-blue/20 rounded-2xl text-xs text-content-body space-y-1">
+        <div className="p-3.5 bg-blue-50/70 border border-brand-blue/20 rounded-2xl text-xs text-content-body space-y-1">
           <p className="font-bold text-brand-blue">Conditions d’éligibilité requises :</p>
           <ul className="list-disc list-inside space-y-0.5 text-slate-700">
-            <li>Avoir participé à la FORMATION NO-CODE 1.</li>
-            <li>Être membre du groupe WhatsApp officiel FORMATION NO-CODE.</li>
+            <li>Avoir participé à la FORMATION NO-CODE 1 & être membre du groupe WhatsApp officiel.</li>
             <li>Une seule candidature autorisée par membre parmi l'ensemble des postes.</li>
           </ul>
         </div>
@@ -226,6 +220,28 @@ export const ApplyCandidate = ({ onNavigate, currentElection }) => {
               />
               <User className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
             </div>
+          </div>
+
+          {/* Champ — Adresse email de notification */}
+          <div className="space-y-1.5">
+            <label htmlFor="candidate-email" className="block text-xs font-bold uppercase tracking-wider text-content-title">
+              Adresse email de notification <span className="text-brand-red">*</span>
+            </label>
+            <div className="relative">
+              <input
+                id="candidate-email"
+                type="email"
+                required={true}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="ex : votre.email@example.com"
+                className="w-full pl-10 pr-4 py-2.5 bg-surface-base border border-surface-border rounded-xl text-sm focus:border-brand-red focus:ring-2 focus:ring-brand-red/20 focus:outline-none transition-all"
+              />
+              <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+            </div>
+            <p className="text-[11px] text-content-muted">
+              Indispensable pour recevoir immédiatement votre accusé de réception et le résultat d'examen de votre dossier.
+            </p>
           </div>
 
           {/* Champ 2 — Numéro WhatsApp */}
